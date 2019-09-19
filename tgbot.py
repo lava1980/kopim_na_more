@@ -41,7 +41,7 @@ def main():
         states = {
                 'purpose': [MessageHandler(Filters.text, get_purpose)],
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
-                'curent_sum': [MessageHandler(Filters.text, get_current_sum)],
+                'current_sum': [MessageHandler(Filters.text, get_current_sum)],
                 'payday_dates': [MessageHandler(Filters.text, get_payday_dates)],
                 'every_month_purp_sum': [MessageHandler(Filters.text, get_every_month_purp_sum)]                
                 
@@ -51,8 +51,8 @@ def main():
     )
     # dp.add_handler(CallbackQueryHandler(handlers.func))
     dp.add_handler(initial_data)   
-    # dp.add_handler(CommandHandler('start', handlers.subscribe))
-    # dp.add_handler(CommandHandler('unsubscribe', handlers.unsubscribe))  
+    dp.add_handler(CommandHandler('start', greet_user))
+    # dp.add_handler(CommandHandler('unsubscribe', handlers.unsubscribe))
     
     
     

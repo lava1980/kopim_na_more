@@ -1,5 +1,6 @@
 import sqlite3
 
+
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
@@ -24,13 +25,37 @@ def write_initial_data_to_base(data):
     conn.commit()
     conn.close()
 
+def write_user_data_to_base(user_data):
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute('''INSERT OR IGNORE INTO users 
+                    (purpose, purpose_date, current_sum, 
+                    payday_dates, every_month_purp_sum) VALUES (?, ?, ?, ?, ?)''', 
+                    user_data)
+    conn.commit()
+    conn.close()
+
+
+def write_entry_to_base(stage, entry, id):
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute(f'UPDATE users SET {stage}=? WHERE chat_id=?', (entry, id))
+    conn.commit()
+    conn.close()    
+
+
+
+
 
 
 
 if __name__ == "__main__":
-    write_initial_data_to_base(('121212313', 'Alex'))
+    write_entry_to_base('purpose', 'лёля', '121212313')
 
 
 
 
 # payday_dates - даты прихода. Можно в одну строку несколько дат. потом их просто парсить.
+
+# TODO Сделать, чтобы люди могли редактировать свои данные (и обновлялась база)
+# TODO Человек указал, и сразу записалось в базу. 
