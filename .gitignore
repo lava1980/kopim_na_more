@@ -1,0 +1,5 @@
+venv/
+.vscode/
+*.log
+config.py
+*.db
