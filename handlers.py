@@ -1,7 +1,14 @@
-from sqlite3.dbapi2 import connect
+import logging
+import sqlite3
 from telegram.ext import ConversationHandler
 
 from utils import *
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s',
+                    level = logging.INFO,
+                    filename = 'tgbot.log'
+                    )
+
 
 def greet_user(update, context):
     context.bot.send_message(chat_id=update.message.chat_id, text='Привет! Этот бот поможет тебе собрать деньги на отдых.')

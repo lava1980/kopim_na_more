@@ -4,3 +4,4 @@ venv/
 config.py
 *.db
 __pycache__/
+ibank_settings.ini

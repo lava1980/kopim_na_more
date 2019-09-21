@@ -1,4 +1,10 @@
+import logging
 import sqlite3
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s',
+                    level = logging.INFO,
+                    filename = 'tgbot.log'
+                    )
 
 
 def create_user_base():
@@ -25,17 +31,6 @@ def write_initial_data_to_base(data):
     conn.commit()
     conn.close()
 
-def write_user_data_to_base(user_data):
-    conn = sqlite3.connect('user_base.db')
-    cursor = conn.cursor()
-    cursor.execute('''INSERT OR IGNORE INTO users 
-                    (purpose, purpose_date, current_sum, 
-                    payday_dates, every_month_purp_sum) VALUES (?, ?, ?, ?, ?)''', 
-                    user_data)
-    conn.commit()
-    conn.close()
-
-
 def write_entry_to_base(stage, entry, id):
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
@@ -43,7 +38,16 @@ def write_entry_to_base(stage, entry, id):
     conn.commit()
     conn.close()    
 
+def get_all_cashflow():
+    pass
 
+
+
+
+
+
+# Сделаю автоматический забор суммы для нас, а для остальных 
+# предусмотрю возможность ввести приход в день прихода. 
 
 
 
@@ -59,3 +63,5 @@ if __name__ == "__main__":
 
 # TODO Сделать, чтобы люди могли редактировать свои данные (и обновлялась база)
 # TODO Человек указал, и сразу записалось в базу. 
+
+# TODO Как добавлять членов семьи в одну группу. Например, как добавить Таню?
