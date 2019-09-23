@@ -38,7 +38,11 @@ def main():
 
     
     initial_data = ConversationHandler(
-        entry_points = [CommandHandler('settings', initial_data_start)],
+        entry_points = [
+            CommandHandler('settings', initial_data_start),
+            CallbackQueryHandler(initial_data_start, pattern='new_user'), 
+            CallbackQueryHandler(invited_user_conv, pattern='invited_user')
+            ],
         states = {
                 'purpose': [MessageHandler(Filters.text, get_purpose)],
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
@@ -49,31 +53,32 @@ def main():
                      
         },
         fallbacks = [MessageHandler(Filters.text, dontknow)]
+        
     )
 
-    invited_user_conv = ConversationHandler(
-        entry_points = [CallbackQueryHandler(send_settings_request)],
-        states = {
-                'purpose': [MessageHandler(Filters.text, get_purpose)],
-                'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
-                'current_sum': [MessageHandler(Filters.text, get_current_sum)],
-                'payday_dates': [MessageHandler(Filters.text, get_payday_dates)],
-                'every_month_purp_sum': [MessageHandler(Filters.text, get_every_month_purp_sum)]                
-                
-                     
-        },
-        fallbacks = [MessageHandler(Filters.text, dontknow)]
-    )
-
-
-    # dp.add_handler(CallbackQueryHandler(handlers.func))
-    dp.add_handler(initial_data)   
-    dp.add_handler(invited_user_conv)
-    dp.add_handler(CommandHandler('start', greet_user))    
-    dp.add_handler(CallbackQueryHandler(send_settings_request))
-
-    # dp.add_handler(CommandHandler('unsubscribe', handlers.unsubscribe))
     
+    enter_secret_key = ConversationHandler(
+        entry_points = [CallbackQueryHandler(invited_user_conv, pattern='invited_user')],
+        states = {
+                'password': [MessageHandler(Filters.text, get_password)],              
+                     
+        },
+        fallbacks = [MessageHandler(Filters.text, dontknow)]
+        
+    )
+
+
+
+
+
+
+    dp.add_handler(enter_secret_key)
+    dp.add_handler(initial_data)     
+    dp.add_handler(CommandHandler('start', greet_user))  
+    
+    
+
+   
     
     
     mybot.start_polling()  

@@ -25,9 +25,10 @@ def create_user_base():
     conn.commit()
     conn.close()
 
-def get_initial_data(update):
-    chat_id = update.message.chat_id
-    first_name = update.message.chat.first_name
+def get_initial_data(update):    
+    query = update.callback_query
+    chat_id = query.message.chat_id
+    first_name = query.message.chat.first_name
     initial_user_data = (chat_id, first_name)
     return initial_user_data
 
