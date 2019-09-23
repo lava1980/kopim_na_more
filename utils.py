@@ -1,5 +1,6 @@
 import logging
 import sqlite3
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s',
                     level = logging.INFO,
@@ -7,13 +8,19 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
                     )
 
 
+def get_inline_keyboard():
+    inlinekeyboard = [[InlineKeyboardButton('Новый пользователь', callback_data='new_user'),
+                        InlineKeyboardButton('Меня пригласили', callback_data='invited_user')]]
+    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
+    return kbd_markup
+
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS users
-                    (chat_id text PRIMARY KEY, first_name text, purpose text, 
+                    (family_id text PRIMARY KEY, chat_id text, first_name text, purpose text, 
                     purpose_date text, current_sum integer, payday_dates text, 
-                    every_month_purp_sum text)'''
+                    every_month_purp_sum text, secret_key text)''' # secret_key для приглашения членов семьи
                     )
     conn.commit()
     conn.close()
@@ -43,6 +50,15 @@ def get_all_cashflow():
 
 
 
+# Первый чел получает логин и пароль. Передаёт второму. Тот их вводит -- и попадает в базу с 
+# айди их общей группы с первым челом. А обновления приходят по айди этой общей группы (не по
+# айди пользователя или чат-айди). 
+
+# У второго чела должна быть возможность выбрать "Мне прислали пароль" или "Меня пригласили". 
+# Чтобы ему не надо было заполнять все данные с нуля. 
+
+
+
 
 
 
@@ -61,7 +77,7 @@ if __name__ == "__main__":
 
 # payday_dates - даты прихода. Можно в одну строку несколько дат. потом их просто парсить.
 
-# TODO Сделать, чтобы люди могли редактировать свои данные (и обновлялась база)
-# TODO Человек указал, и сразу записалось в базу. 
+# TODO Сделать при выборе команды НАСТРОЙКИ, чтобы спрашивал: "новый пользователь" и "меня пригласили".
+# Если пригласили, то предлагает ввести логин и пароль.
 
-# TODO Как добавлять членов семьи в одну группу. Например, как добавить Таню?
+# TODO Сделать, чтобы люди могли редактировать свои данные (и обновлялась база)

@@ -3,8 +3,9 @@ import logging
 import random
 import sqlite3
 
+from telegram import InlineQuery
 from telegram.ext import Updater, CallbackQueryHandler, ConversationHandler, CommandHandler, \
-        MessageHandler, RegexHandler, Filters
+        MessageHandler, RegexHandler, Filters, CallbackQueryHandler
 from telegram.ext import messagequeue as mq
 
 import config
@@ -37,7 +38,7 @@ def main():
 
     
     initial_data = ConversationHandler(
-        entry_points = [CommandHandler('settings', initial_data_start)], 
+        entry_points = [CommandHandler('settings', initial_data_start)],
         states = {
                 'purpose': [MessageHandler(Filters.text, get_purpose)],
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
@@ -49,9 +50,28 @@ def main():
         },
         fallbacks = [MessageHandler(Filters.text, dontknow)]
     )
+
+    invited_user_conv = ConversationHandler(
+        entry_points = [CallbackQueryHandler(send_settings_request)],
+        states = {
+                'purpose': [MessageHandler(Filters.text, get_purpose)],
+                'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
+                'current_sum': [MessageHandler(Filters.text, get_current_sum)],
+                'payday_dates': [MessageHandler(Filters.text, get_payday_dates)],
+                'every_month_purp_sum': [MessageHandler(Filters.text, get_every_month_purp_sum)]                
+                
+                     
+        },
+        fallbacks = [MessageHandler(Filters.text, dontknow)]
+    )
+
+
     # dp.add_handler(CallbackQueryHandler(handlers.func))
     dp.add_handler(initial_data)   
-    dp.add_handler(CommandHandler('start', greet_user))
+    dp.add_handler(invited_user_conv)
+    dp.add_handler(CommandHandler('start', greet_user))    
+    dp.add_handler(CallbackQueryHandler(send_settings_request))
+
     # dp.add_handler(CommandHandler('unsubscribe', handlers.unsubscribe))
     
     
