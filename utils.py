@@ -1,4 +1,5 @@
 import logging
+import random
 import sqlite3
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -46,8 +47,29 @@ def write_entry_to_base(stage, entry, id):
     conn.commit()
     conn.close()    
 
+def list_from_base_column(column): # Возвращает список значений столбца
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT {column} FROM users')
+    column_list = cursor.fetchall()
+    conn.commit()
+    conn.close()    
+    return column_list # [('-yGIB7rf?NKU0Dk',), (None,)]
+
+
 def get_all_cashflow():
     pass
+
+
+def password_generation():
+    chars = '+-/*!&$#?=@<>abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
+    length = 15    
+    password = ''
+    for i in range(length):
+        password += random.choice(chars)
+    return password
+
+
 
 
 
@@ -71,7 +93,7 @@ def get_all_cashflow():
 
 
 if __name__ == "__main__":
-    write_entry_to_base('purpose', 'лёля', '121212313')
+    list_from_base_column('secret_key')
 
 
 

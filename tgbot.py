@@ -48,7 +48,9 @@ def main():
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
                 'current_sum': [MessageHandler(Filters.text, get_current_sum)],
                 'payday_dates': [MessageHandler(Filters.text, get_payday_dates)],
-                'every_month_purp_sum': [MessageHandler(Filters.text, get_every_month_purp_sum)]                
+                'every_month_purp_sum': [MessageHandler(Filters.text, get_every_month_purp_sum)]               
+
+                                
                 
                      
         },
@@ -60,7 +62,7 @@ def main():
     enter_secret_key = ConversationHandler(
         entry_points = [CallbackQueryHandler(invited_user_conv, pattern='invited_user')],
         states = {
-                'password': [MessageHandler(Filters.text, get_password)],              
+                'secret_key': [MessageHandler(Filters.text, get_password)],              
                      
         },
         fallbacks = [MessageHandler(Filters.text, dontknow)]

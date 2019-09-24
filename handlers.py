@@ -1,6 +1,6 @@
 import logging
 import sqlite3
-from telegram import ChatAction
+from telegram import ChatAction, ParseMode
 from telegram.ext import ConversationHandler
 import time
 
@@ -55,21 +55,30 @@ def get_payday_dates(update, context):
 def get_every_month_purp_sum(update, context):    
     write_entry_to_base('every_month_purp_sum', update.message.text, update.message.chat_id)
     update.message.reply_text('Спасибо, ответы принял.')
-    return ConversationHandler.END
+    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
+    time.sleep(2)
+    password = password_generation()
+    write_entry_to_base('secret_key', password, update.message.chat_id)
+    update.message.reply_text('Пароль вашей семьи: ' + password)
+    update.message.reply_text('Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю инфу.')
+    return ConversationHandler.END   
 
 def dontknow(update, context):
-    update.message.reply_text('Чё-то я не втыкаю. За тобой косяк, командир, проверь ещё разок, что ты накарябал')
+    update.message.reply_text('Не понимаю, что вы имеете ввиду. Проверьте что вы написали')
  
 ######################################
 
 def invited_user_conv(update, context):
     query = update.callback_query        
     query.message.reply_text('Введите секретный пароль семьи')
-    return 'password'
+    return 'secret_key'
 
 def get_password(update, context):
-    update.message.reply_text('Вы ввели пароль: ' + update.message.text)
+    pass_list = list_from_base_column('secret_key') # [('-yGIB7rf?NKU0Dk',), (None,)]
+    for item in pass_list:
+        if item[0] == update.message.text:            
+            write_entry_to_base('secret_key', update.message.text, update.message.chat_id)
+            update.message.reply_text('Пароль найден в базе.')
     return ConversationHandler.END
-
 
 
