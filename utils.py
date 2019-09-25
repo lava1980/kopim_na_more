@@ -67,6 +67,16 @@ def update_invited_user_data(chatid):
     conn.commit()
     conn.close()
 
+# def get_date():
+#     conn = sqlite3.connect('user_base.db')
+#     cursor = conn.cursor()
+#     cursor.execute(f'SELECT {column} FROM users WHERE ')
+#     column_list = cursor.fetchall()
+#     conn.commit()
+#     conn.close()    
+#     return column_list # [('-yGIB7rf?NKU0Dk',), (None,)]
+
+
 def password_generation():
     chars = '+-/*!&$#?=@<>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
     length = 15    
@@ -74,6 +84,42 @@ def password_generation():
     for i in range(length):
         password += random.choice(chars)
     return password
+
+def user_entry_date_handler(user_entry): # Обрабатываем ввод пользователя
+    
+    
+    # [int(s) for s in user_entry.split() if s.isdigit()]
+    if ',' in user_entry:
+        user_entry = user_entry.replace(',', ' ')
+    if '-го' in user_entry:
+        user_entry = user_entry.replace('-го', '')
+    date_list = [int(s) for s in user_entry.split() if s.isdigit()]
+    for date in date_list:
+        if date > 31:
+            print('Похоже, вы ошиблись. Дата не может быть больше 31')
+            
+            
+    p = ''
+    for s in user_entry.split():          
+        if s.isdigit() == True:      # Сделать append в список                  
+            if user_entry.split().index(s) == len(user_entry.split()) - 1:
+                p += s 
+            else: p += s + ', '
+    print(p)
+    print(str(date_list))
+
+    # 23 и 11
+    # 23, 11, 15
+    # 23-го
+
+
+    
+
+
+
+
+def payday_date_handker():   # Проверяем или дата не приходится на выходной
+    pass
 
 
 
@@ -86,9 +132,10 @@ def password_generation():
 
 
 if __name__ == "__main__":
-    update_invited_user_data('891850606')
+    # user_entry_date_handler('23, 11, 15')
+    user_entry_date_handler('23-го и 15-го, и  ещё 25-го    32')
 
-# payday_dates - даты прихода. Можно в одну строку несколько дат. потом их просто парсить.
+
 
 # TODO Сделать при выборе команды НАСТРОЙКИ, чтобы спрашивал: "новый пользователь" и "меня пригласили".
 # Если пригласили, то предлагает ввести логин и пароль.
