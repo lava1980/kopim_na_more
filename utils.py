@@ -86,27 +86,23 @@ def password_generation():
     return password
 
 def user_entry_date_handler(user_entry): # Обрабатываем ввод пользователя
-    
-    
-    # [int(s) for s in user_entry.split() if s.isdigit()]
     if ',' in user_entry:
         user_entry = user_entry.replace(',', ' ')
     if '-го' in user_entry:
-        user_entry = user_entry.replace('-го', '')
-    date_list = [int(s) for s in user_entry.split() if s.isdigit()]
-    for date in date_list:
-        if date > 31:
-            print('Похоже, вы ошиблись. Дата не может быть больше 31')
-            
-            
-    p = ''
+        user_entry = user_entry.replace('-го', '')           
+    date_list = []
     for s in user_entry.split():          
-        if s.isdigit() == True:      # Сделать append в список                  
-            if user_entry.split().index(s) == len(user_entry.split()) - 1:
-                p += s 
-            else: p += s + ', '
-    print(p)
-    print(str(date_list))
+        if s.isdigit() == True:                 
+            date_list.append(s)
+    for date in date_list:
+        if int(date) > 31:
+            print('Похоже, вы ввели неверное число. Дата не может быть больше 31. Введите правильные даты прихода. Например, 11 и 23')
+            return 'payday_dates'    
+    date_list.sort()
+    dates_str_to_base = ', '.join(date_list)
+    return dates_str_to_base
+    
+    
 
     # 23 и 11
     # 23, 11, 15
