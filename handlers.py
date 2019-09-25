@@ -47,8 +47,12 @@ def get_current_sum(update, context):
     update.message.reply_text('В какие дни у вас приход денег?')
     return 'payday_dates'
 
-def get_payday_dates(update, context):    
-    write_entry_to_base('payday_dates', update.message.text, update.message.chat_id)
+def get_payday_dates(update, context):   
+    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
+    dates = user_entry_date_handler(update.message.text, update)
+    if dates == 'payday_dates':
+        return 'payday_dates'
+    write_entry_to_base('payday_dates', dates, update.message.chat_id)
     update.message.reply_text('Сколько планируете откладывать в месяц?')
     return 'every_month_purp_sum'
 

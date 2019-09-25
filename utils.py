@@ -76,7 +76,6 @@ def update_invited_user_data(chatid):
 #     conn.close()    
 #     return column_list # [('-yGIB7rf?NKU0Dk',), (None,)]
 
-
 def password_generation():
     chars = '+-/*!&$#?=@<>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
     length = 15    
@@ -85,7 +84,7 @@ def password_generation():
         password += random.choice(chars)
     return password
 
-def user_entry_date_handler(user_entry): # Обрабатываем ввод пользователя
+def user_entry_date_handler(user_entry, update): # Обрабатываем ввод пользователя
     if ',' in user_entry:
         user_entry = user_entry.replace(',', ' ')
     if '-го' in user_entry:
@@ -96,19 +95,13 @@ def user_entry_date_handler(user_entry): # Обрабатываем ввод п�
             date_list.append(s)
     for date in date_list:
         if int(date) > 31:
-            print('Похоже, вы ввели неверное число. Дата не может быть больше 31. Введите правильные даты прихода. Например, 11 и 23')
+            update.message.reply_text(
+                'Похоже, вы ввели неверное число. Дата не может быть больше 31. Введите правильные даты прихода. Например, 11 и 23')            
             return 'payday_dates'    
     date_list.sort()
     dates_str_to_base = ', '.join(date_list)
     return dates_str_to_base
     
-    
-
-    # 23 и 11
-    # 23, 11, 15
-    # 23-го
-
-
     
 
 
