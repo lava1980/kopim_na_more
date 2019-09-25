@@ -20,6 +20,12 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
                     )
 
 
+def send_updates(context):
+    date_list = list_from_base_column('payday_dates')
+    for date_from_base in date_list:
+        if datetime.datetime.now().day == date_from_base[0]: # Здесь будет подставляться дата из базы
+            context.bot.send_message(chat_id='529133148', text='Сработало')
+    
 
 
 def main():    
@@ -35,6 +41,8 @@ def main():
     logging.info('Бот запускается.')
 
     dp = mybot.dispatcher
+    
+    mybot.job_queue.run_repeating(send_updates, 5, 1)
 
     
     initial_data = ConversationHandler(
@@ -89,3 +97,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# TODO Когда дата отпуска достигнута, выдать сообщение -- похвалить или утешить. 
+# И обнулить данные в базе
+

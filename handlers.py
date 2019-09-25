@@ -60,7 +60,7 @@ def get_every_month_purp_sum(update, context):
     password = password_generation()
     write_entry_to_base('secret_key', password, update.message.chat_id)
     update.message.reply_text('Пароль вашей семьи: ' + password)
-    update.message.reply_text('Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю инфу.')
+    update.message.reply_text('Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю историю.')
     return ConversationHandler.END   
 
 def dontknow(update, context):
@@ -78,7 +78,14 @@ def get_password(update, context):
     for item in pass_list:
         if item[0] == update.message.text:            
             write_entry_to_base('secret_key', update.message.text, update.message.chat_id)
-            update.message.reply_text('Пароль найден в базе.')
+            update_invited_user_data(update.message.chat_id) # Удаляем данные, если они были
+            update.message.reply_text('Отлично! Теперь вам будут приходить уведомления')
+            break
+        else: 
+            update.message.reply_text('Пароль не найден. Уточните ещё раз')
+            return 'secret_key'
     return ConversationHandler.END
 
+# TODO Нужно доставать даты из базы и парсить -- это первое. 
 
+# TODO Потом что? Когда у меня уже есть список из дат, дальше можно с ними работать. 

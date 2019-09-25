@@ -56,29 +56,24 @@ def list_from_base_column(column): # Возвращает список знач�
     conn.close()    
     return column_list # [('-yGIB7rf?NKU0Dk',), (None,)]
 
-
-def get_all_cashflow():
-    pass
-
+def update_invited_user_data(chatid):
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        '''UPDATE users SET purpose=Null, purpose_date=Null, 
+        current_sum=Null, payday_dates=Null, every_month_purp_sum=Null WHERE chat_id=?''', 
+        (chatid,)
+        )
+    conn.commit()
+    conn.close()
 
 def password_generation():
-    chars = '+-/*!&$#?=@<>abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
+    chars = '+-/*!&$#?=@<>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
     length = 15    
     password = ''
     for i in range(length):
         password += random.choice(chars)
     return password
-
-
-
-
-
-# Первый чел получает логин и пароль. Передаёт второму. Тот их вводит -- и попадает в базу с 
-# айди их общей группы с первым челом. А обновления приходят по айди этой общей группы (не по
-# айди пользователя или чат-айди). 
-
-# У второго чела должна быть возможность выбрать "Мне прислали пароль" или "Меня пригласили". 
-# Чтобы ему не надо было заполнять все данные с нуля. 
 
 
 
@@ -90,13 +85,8 @@ def password_generation():
 
 
 
-
-
 if __name__ == "__main__":
-    list_from_base_column('secret_key')
-
-
-
+    update_invited_user_data('891850606')
 
 # payday_dates - даты прихода. Можно в одну строку несколько дат. потом их просто парсить.
 
