@@ -67,14 +67,16 @@ def update_invited_user_data(chatid):
     conn.commit()
     conn.close()
 
-# def get_date():
-#     conn = sqlite3.connect('user_base.db')
-#     cursor = conn.cursor()
-#     cursor.execute(f'SELECT {column} FROM users WHERE ')
-#     column_list = cursor.fetchall()
-#     conn.commit()
-#     conn.close()    
-#     return column_list # [('-yGIB7rf?NKU0Dk',), (None,)]
+def get_date_string(column, chat_id):
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT {column} FROM users WHERE chat_id=?', (chat_id,))
+    date_list = cursor.fetchone()
+    conn.commit()
+    conn.close()    
+    date_list = date_list[0].split(', ') 
+    print(date_list)   
+    return date_list
 
 def password_generation():
     chars = '+-/*!&$#?=@<>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
@@ -107,7 +109,7 @@ def user_entry_date_handler(user_entry, update): # Обрабатываем вв
 
 
 
-def payday_date_handker():   # Проверяем или дата не приходится на выходной
+def payday_date_handler():   # Проверяем или дата не приходится на выходной
     pass
 
 
@@ -120,9 +122,8 @@ def payday_date_handker():   # Проверяем или дата не прих�
 
 
 
-if __name__ == "__main__":
-    # user_entry_date_handler('23, 11, 15')
-    user_entry_date_handler('23-го и 15-го, и  ещё 25-го    32')
+if __name__ == "__main__":    
+    get_date_string('payday_dates', '529133148')
 
 
 

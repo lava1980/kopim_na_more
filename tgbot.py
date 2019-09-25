@@ -21,9 +21,10 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
 
 
 def send_updates(context):
-    date_list = list_from_base_column('payday_dates')
+    date_list = get_date_string('payday_dates', '529133148')
     for date_from_base in date_list:
-        if datetime.datetime.now().day == date_from_base[0]: # Здесь будет подставляться дата из базы
+        today_date = datetime.datetime.now().day
+        if today_date == int(date_from_base): # Здесь будет подставляться дата из базы
             context.bot.send_message(chat_id='529133148', text='Сработало')
     
 
@@ -42,7 +43,7 @@ def main():
 
     dp = mybot.dispatcher
     
-    mybot.job_queue.run_repeating(send_updates, 5, 1)
+    mybot.job_queue.run_repeating(send_updates, 60, 1)
 
     
     initial_data = ConversationHandler(
