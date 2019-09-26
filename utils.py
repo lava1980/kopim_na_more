@@ -110,25 +110,25 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
     if int(date_from_base) == today_date:
         print(date_from_base)
         return date_from_base
-    else:       
-        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-        tomorrow_date = tomorrow.day # 27
-        day_of_week_tomorr = tomorrow.isoweekday() # 5
-        if int(date_from_base) == tomorrow_date:
-            if day_of_week_tomorr == 6:
-                print(today_date)
-                return today_date
+           
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    tomorrow_date = tomorrow.day # 27
+    day_of_week_tomorr = tomorrow.isoweekday() # 5
+    if int(date_from_base) == tomorrow_date:
+        if day_of_week_tomorr == 6:
+            print(today_date)
+            return today_date
 
-        after_tomorrow = datetime.date.today() + datetime.timedelta(days=2)
-        after_tomorrow_date = after_tomorrow.day # 28
-        day_of_week_after_tomorr = after_tomorrow.isoweekday() # 6
-        if int(date_from_base) == after_tomorrow_date:
-            if day_of_week_after_tomorr == 7:
-                print(today_date)
-                return today_date
-        
-        print(date_from_base)
-        return date_from_base
+    after_tomorrow = datetime.date.today() + datetime.timedelta(days=2)
+    after_tomorrow_date = after_tomorrow.day # 28
+    day_of_week_after_tomorr = after_tomorrow.isoweekday() # 6
+    if int(date_from_base) == after_tomorrow_date:
+        if day_of_week_after_tomorr == 7:
+            print(today_date)
+            return today_date
+    
+    print(date_from_base)
+    return date_from_base
 
 # def is_weekend(delta, date_from_base):
 #     date = datetime.date.today() + datetime.timedelta(days=delta)

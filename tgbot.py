@@ -22,13 +22,22 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
 
 def send_updates(context):
     today_date = datetime.datetime.now().day
-    date_list = get_date_string('payday_dates', '529133148')
+    date_list = get_date_string('payday_dates', config.ADMIN_ID)
     for date_from_base in date_list:
         date_from_base = payday_date_handler(date_from_base)
         if today_date == int(date_from_base):
             # Основной код, который должен выполняться в день выдачи зарплаты
-            context.bot.send_message(chat_id='529133148', text='Сработало')
+            context.bot.send_message(
+                chat_id=config.ADMIN_ID, 
+                text='Привет! Сегодня классный день -- день зарплаты! Вы получили деньги?')
     
+# Как понять, кому слать сообщения? Как понять, кому слать? 
+# Сделать выборку из базы Айди и Паролей. 
+
+# 1. Отобрать все столбцы (дата, чат айди, пароль)
+# 2. Из них отобрать те, в которых дата совпадает в текущей датой
+
+
 
 
 def main():    
@@ -45,7 +54,7 @@ def main():
 
     dp = mybot.dispatcher
     
-    mybot.job_queue.run_repeating(send_updates, 60, 1)
+    mybot.job_queue.run_repeating(send_updates, 60, 1)    
 
     
     initial_data = ConversationHandler(
@@ -59,11 +68,8 @@ def main():
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
                 'current_sum': [MessageHandler(Filters.text, get_current_sum)],
                 'payday_dates': [MessageHandler(Filters.text, get_payday_dates)],
-                'every_month_purp_sum': [MessageHandler(Filters.text, get_every_month_purp_sum)]               
-
-                                
-                
-                     
+                'every_month_purp_sum': [MessageHandler(Filters.text, get_every_month_purp_sum)]                                               
+                    
         },
         fallbacks = [MessageHandler(Filters.text, dontknow)]
         
@@ -82,9 +88,7 @@ def main():
 
     dp.add_handler(enter_secret_key)
     dp.add_handler(initial_data)     
-    dp.add_handler(CommandHandler('start', greet_user))  
-      
-    
+    dp.add_handler(CommandHandler('start', greet_user))      
     
     mybot.start_polling()  
     mybot.idle()

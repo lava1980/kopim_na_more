@@ -59,8 +59,7 @@ def get_payday_dates(update, context):
 def get_every_month_purp_sum(update, context):    
     write_entry_to_base('every_month_purp_sum', update.message.text, update.message.chat_id)
     update.message.reply_text('Спасибо, ответы принял.')
-    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
-    time.sleep(2)
+    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)    
     password = password_generation()
     write_entry_to_base('secret_key', password, update.message.chat_id)
     update.message.reply_text('Пароль вашей семьи: ' + password)
