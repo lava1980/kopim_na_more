@@ -79,6 +79,35 @@ def get_date_string(column, chat_id):
     print(date_list)   
     return date_list
 
+def select_subscribers():    
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT chat_id, payday_dates, secret_key FROM users'
+        )
+    subscribers_list = cursor.fetchall()
+    conn.commit()
+    conn.close()          
+    return subscribers_list
+
+def get_subscribers_send_to(date_str): # 11
+    subs_list = select_subscribers()
+    subs_list_send_to = []
+    for subscriber in subs_list:
+        date_list = subscriber[1].split(', ')
+        if date_str in date_list:
+            subs_list_send_to.append(subscriber)
+    print(list(subs_list_send_to))
+    return subs_list_send_to # [('891850606', '2, 1, 13', '-yGIB7rf?NKU0Dk')]
+
+
+    
+
+
+
+
+
+
 def password_generation():
     chars = '+-/*!&$#?=@<>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
     length = 15    
@@ -150,7 +179,8 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
 
 
 if __name__ == "__main__":        
-    payday_date_handler('28')
+    # payday_date_handler('28')
+    get_subscribers_send_to('1')
 
 
 
