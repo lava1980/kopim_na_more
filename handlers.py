@@ -89,7 +89,3 @@ def get_password(update, context):
             update.message.reply_text('Пароль не найден. Уточните ещё раз')
             return 'secret_key'
     return ConversationHandler.END
-
-# TODO Нужно доставать даты из базы и парсить -- это первое. 
-
-# TODO Потом что? Когда у меня уже есть список из дат, дальше можно с ними работать. 
