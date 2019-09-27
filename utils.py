@@ -79,6 +79,17 @@ def get_date_string(column, chat_id):
     print(date_list)   
     return date_list
 
+def select_family_list(password):
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT chat_id, secret_key FROM users WHERE secret_key=?', (password,))
+    date_list = cursor.fetchall()
+    conn.commit()
+    conn.close()        
+    print(date_list)   
+    return date_list
+
+
 def select_subscribers():    
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
@@ -90,7 +101,7 @@ def select_subscribers():
     conn.close()          
     return subscribers_list
 
-def get_subscribers_send_to(date_str): # 11
+def get_subscribers_send_to(date_str): # '11'
     subs_list = select_subscribers()
     subs_list_send_to = []
     for subscriber in subs_list:
@@ -159,6 +170,9 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
     print(date_from_base)
     return date_from_base
 
+# Сделать, чтобы когда зарплата приходится на выходной, чтобы челу потом и в выходной не 
+# приходило уведомление
+
 # def is_weekend(delta, date_from_base):
 #     date = datetime.date.today() + datetime.timedelta(days=delta)
 #     date_day = date.day # 27
@@ -180,7 +194,8 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
 
 if __name__ == "__main__":        
     # payday_date_handler('28')
-    get_subscribers_send_to('1')
+    # get_subscribers_send_to('1')
+    select_family_list('$DDMsf!cIzpyehr')
 
 
 

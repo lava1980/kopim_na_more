@@ -20,22 +20,27 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
                     )
 
 
-def send_updates(context):
+def send_updates(context):    
     today_date = datetime.datetime.now().day
-    date_list = get_date_string('payday_dates', config.ADMIN_ID)
-    for date_from_base in date_list:
-        date_from_base = payday_date_handler(date_from_base)
-        if today_date == int(date_from_base):
-            # Основной код, который должен выполняться в день выдачи зарплаты
-            context.bot.send_message(
-                chat_id=config.ADMIN_ID, 
-                text='Привет! Сегодня классный день -- день зарплаты! Вы получили деньги?')
+    subs_list = get_subscribers_send_to(str(today_date)) # [('891850606', '2, 1, 13', '-yGIB7rf?NKU0Dk')]
+    for subs in subs_list:
+        chat_id, dates, password = subs
+        date_list = dates.split(', ')
     
-# Как понять, кому слать сообщения? Как понять, кому слать? 
-# Сделать выборку из базы Айди и Паролей. 
+        for date_from_base in date_list:
+            date_from_base = payday_date_handler(date_from_base)
+            if today_date == int(date_from_base):
+                # Основной код, который должен выполняться в день выдачи зарплаты
+                family_list = select_family_list(password)
+                for user in family_list:
+                    chat_id = user[0]
+                    context.bot.send_message(
+                        chat_id=config.ADMIN_ID, 
+                        text='Привет! Сегодня классный день -- день зарплаты! Вы получили деньги?')
+    
 
-# 1. Отобрать все столбцы (дата, чат айди, пароль)
-# 2. Из них отобрать те, в которых дата совпадает в текущей датой
+
+
 
 
 
