@@ -16,6 +16,12 @@ def get_inline_keyboard():
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
+def pay_day_inline_keyboard1():
+    inlinekeyboard = [[InlineKeyboardButton('Да', callback_data='yes'),
+                        InlineKeyboardButton('Нет', callback_data='no')]]
+    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
+    return kbd_markup
+
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
@@ -193,9 +199,9 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
 
 
 if __name__ == "__main__":        
-    # payday_date_handler('28')
-    # get_subscribers_send_to('1')
-    select_family_list('$DDMsf!cIzpyehr')
+    payday_date_handler('30')
+    # get_subscribers_send_to('3')
+    # select_family_list('$DDMsf!cIzpyehr')
 
 
 

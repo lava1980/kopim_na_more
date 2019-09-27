@@ -23,23 +23,30 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
 def send_updates(context):    
     today_date = datetime.datetime.now().day
     subs_list = get_subscribers_send_to(str(today_date)) # [('891850606', '2, 1, 13', '-yGIB7rf?NKU0Dk')]
+    if len(subs_list) == 0:
+        return False
     for subs in subs_list:
         chat_id, dates, password = subs
         date_list = dates.split(', ')
     
         for date_from_base in date_list:
-            date_from_base = payday_date_handler(date_from_base)
+            date_from_base = payday_date_handler(date_from_base) # Проверяем или з/п не приходится на выходной
             if today_date == int(date_from_base):
-                # Основной код, который должен выполняться в день выдачи зарплаты
-                family_list = select_family_list(password)
-                for user in family_list:
-                    chat_id = user[0]
-                    context.bot.send_message(
-                        chat_id=config.ADMIN_ID, 
-                        text='Привет! Сегодня классный день -- день зарплаты! Вы получили деньги?')
+                # Основной код, который должен выполняться в день выдачи зарплаты                
+                context.bot.send_message(
+                    chat_id=config.ADMIN_ID, 
+                    text='Привет! Сегодня классный день -- день зарплаты! Вы получили деньги?',
+                    reply_markup=pay_day_inline_keyboard1()
+                    )
     
 
 
+# Это должны быть два разных сообщения. Первое -- инициализирует диалог. 
+# Как только диалог начался, подключаются хэндлеры. Так? 
+
+# И не админу приходит только информация о уже совершённом действии. 
+
+# Т.е. сразу нужно отобрать что? Сразу нужно отобрать данные только АДМИНОВ.
 
 
 
@@ -90,6 +97,17 @@ def main():
         fallbacks = [MessageHandler(Filters.text, dontknow)]
         
     )
+
+    enter_pay_sum = ConversationHandler(
+        entry_points = [],
+        states = {
+
+
+
+        }, 
+        fallbacks = []
+    )
+
 
     dp.add_handler(enter_secret_key)
     dp.add_handler(initial_data)     
