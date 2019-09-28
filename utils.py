@@ -22,6 +22,16 @@ def pay_day_inline_keyboard1():
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
+def pay_day_inline_keyboard2(every_month_purp_sum):
+    inlinekeyboard = [
+        [InlineKeyboardButton(every_month_purp_sum, callback_data='every_month_purp_sum'),
+        InlineKeyboardButton('Другая', callback_data='other')],
+        [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]
+                        
+                        ]
+    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
+    return kbd_markup
+
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
@@ -84,6 +94,15 @@ def get_date_string(column, chat_id):
     date_list = date_list[0].split(', ') 
     print(date_list)   
     return date_list
+
+def get_data_cell(column, chat_id):
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT {column} FROM users WHERE chat_id=?', (chat_id,))
+    date_list = cursor.fetchone()
+    conn.commit()
+    conn.close()               
+    return date_list[0]
 
 def select_family_list(password):
     conn = sqlite3.connect('user_base.db')

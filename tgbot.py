@@ -75,8 +75,9 @@ def main():
             CallbackQueryHandler(initial_data_start, pattern='new_user'), 
             CallbackQueryHandler(invited_user_conv, pattern='invited_user')
             ],
-        states = {
+        states = {                
                 'purpose': [MessageHandler(Filters.text, get_purpose)],
+                'purpose_sum': [MessageHandler(Filters.text, get_purpose_sum)],
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
                 'current_sum': [MessageHandler(Filters.text, get_current_sum)],
                 'payday_dates': [MessageHandler(Filters.text, get_payday_dates)],
@@ -99,8 +100,11 @@ def main():
     )
 
     enter_pay_sum = ConversationHandler(
-        entry_points = [],
+        entry_points = [CallbackQueryHandler(start_enter_pay_sum, pattern='yes')],
         states = {
+            'payed_summ': [MessageHandler(Filters.text, get_payed_summ)],
+            'how_much_saving': []
+            
 
 
 
@@ -110,7 +114,8 @@ def main():
 
 
     dp.add_handler(enter_secret_key)
-    dp.add_handler(initial_data)     
+    dp.add_handler(initial_data) 
+    dp.add_handler(enter_pay_sum)    
     dp.add_handler(CommandHandler('start', greet_user))      
     
     mybot.start_polling()  

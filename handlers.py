@@ -32,8 +32,13 @@ def initial_data_start(update, context):
     query.message.reply_text('На что копим?')
     return 'purpose'
 
-def get_purpose(update, context):    
+def get_purpose(update, context):
     write_entry_to_base('purpose', update.message.text, update.message.chat_id)
+    update.message.reply_text('Какую сумму хотите собрать?')    
+    return 'purpose_sum'
+
+def get_purpose_sum(update, context):    
+    write_entry_to_base('purpose_sum', update.message.text, update.message.chat_id)
     update.message.reply_text('Когда планируете ехать?')
     return 'purpose_date'
 
@@ -88,3 +93,39 @@ def get_password(update, context):
             update.message.reply_text('Пароль не найден. Уточните ещё раз')
             return 'secret_key'
     return ConversationHandler.END
+
+##################################################
+
+def start_enter_pay_sum(update, context):
+    query = update.callback_query
+    query.message.reply_text('Введите общую сумму прихода за сегодня')
+    return 'payed_summ'
+
+def get_payed_summ(update, context):
+    payed_summ = update.message.text
+    every_month_purp_sum = get_data_cell('every_month_purp_sum', update.message.chat_id)
+    charges = get_data_cell('charges', update.message.chat_id)
+    cashflow = int(payed_summ) - charges
+    if cashflow < 100:
+        text = f'''В этом месяце небольшой приход. Комфортно вы можете отложить 
+столько-то. Если поднапрячься, можно выкроить и {every_month_purp_sum} долларов. 
+Какую сумму отложим?'''
+        update.message.reply_text(text) # Сюда тоже кейборд сделать
+    else:        
+        update.message.reply_text(
+            f'Вы можете отложить {every_month_purp_sum} долларов или больше. \
+            Сколько откладываем?', reply_markup=pay_day_inline_keyboard2(every_month_purp_sum))
+
+
+
+
+
+    # Здесь развилка: если денег мало, и если денег достаточно
+    # Получить расходы
+    # Найти разницу
+    # Если разница меньше 100 рублей, то одно сообщение
+    # Если больше, то другое
+
+def get_how_much_saving(update, context):
+    pass
+
