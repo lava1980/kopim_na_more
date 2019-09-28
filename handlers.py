@@ -131,7 +131,6 @@ def get_how_much_saving(update, context):
     
 #########################################################
 
-
 def get_other_sum(update, context):
     query = update.callback_query    
     logging.info('query.data = ' + query.data)
@@ -146,4 +145,8 @@ def get_how_much_saving1(update, context):
     update.message.reply_text('Здесь будет резюме: что он собрал и сколько осталось')
     return ConversationHandler.END
     
-    
+###########################################################
+
+def pass_current_month(update, context):
+    query = update.callback_query
+    query.message.reply_text('Выбрал Пропустить в этом месяце')

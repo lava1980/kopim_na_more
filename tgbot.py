@@ -104,6 +104,7 @@ def main():
         states = {
             'payed_summ': [MessageHandler(Filters.text, get_payed_summ)],
             'how_much_saving': [CallbackQueryHandler(get_other_sum, pattern='other'),
+                                CallbackQueryHandler(pass_current_month, pattern='pass_current_month'),
                                 CallbackQueryHandler(get_how_much_saving)],
             'enter_sum': [MessageHandler(Filters.text, get_how_much_saving1)] 
         }, 
