@@ -24,7 +24,8 @@ def pay_day_inline_keyboard1():
 
 def pay_day_inline_keyboard2(every_month_purp_sum):
     inlinekeyboard = [
-        [InlineKeyboardButton(every_month_purp_sum, callback_data='every_month_purp_sum'),
+        [InlineKeyboardButton(every_month_purp_sum, callback_data=every_month_purp_sum),
+        # [InlineKeyboardButton(every_month_purp_sum, callback_data='50'),
         InlineKeyboardButton('Другая', callback_data='other')],
         [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]
                         

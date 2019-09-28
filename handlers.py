@@ -74,7 +74,7 @@ def get_every_month_purp_sum(update, context):
 def dontknow(update, context):
     update.message.reply_text('Не понимаю, что вы имеете ввиду. Проверьте что вы написали')
  
-######################################
+##################################################
 
 def invited_user_conv(update, context):
     query = update.callback_query        
@@ -102,30 +102,51 @@ def start_enter_pay_sum(update, context):
     return 'payed_summ'
 
 def get_payed_summ(update, context):
-    payed_summ = update.message.text
+    payed_summ = update.message.text    
     every_month_purp_sum = get_data_cell('every_month_purp_sum', update.message.chat_id)
     charges = get_data_cell('charges', update.message.chat_id)
     cashflow = int(payed_summ) - charges
     if cashflow < 100:
-        text = f'''В этом месяце небольшой приход. Комфортно вы можете отложить 
-столько-то. Если поднапрячься, можно выкроить и {every_month_purp_sum} долларов. 
+        text = f'''В этом месяце небольшой приход. Комфортно вы можете отложить \
+столько-то. Если поднапрячься, можно выкроить и {every_month_purp_sum} долларов. \
 Какую сумму отложим?'''
-        update.message.reply_text(text) # Сюда тоже кейборд сделать
+        update.message.reply_text(text) # TODO Сюда тоже кейборд сделать
     else:        
         update.message.reply_text(
             f'Вы можете отложить {every_month_purp_sum} долларов или больше. \
-            Сколько откладываем?', reply_markup=pay_day_inline_keyboard2(every_month_purp_sum))
-
-
-
-
-
-    # Здесь развилка: если денег мало, и если денег достаточно
-    # Получить расходы
-    # Найти разницу
-    # Если разница меньше 100 рублей, то одно сообщение
-    # Если больше, то другое
+Сколько откладываем?', 
+            reply_markup=pay_day_inline_keyboard2(every_month_purp_sum))
+    return 'how_much_saving'
 
 def get_how_much_saving(update, context):
-    pass
+    query = update.callback_query
+    every_month_purp_sum = get_data_cell('every_month_purp_sum', query.message.chat_id)    
+    if query.data == every_month_purp_sum:
+        query.message.reply_text('Отлично, информацию принял!')
+        # Сложить с той суммой, что есть в базе
+        time.sleep(2)
+        query.message.reply_text('Здесь будет резюме: что он собрал и сколько осталось')
+        return ConversationHandler.END
+    if query.data == 'other':
+        return ConversationHandler.END
 
+ 
+    
+#########################################################
+
+
+def get_other_sum(update, context):
+    query = update.callback_query    
+    logging.info('query.data = ' + query.data)
+    query.message.reply_text('Введите сумму, которую отложите')
+    # Сложить с той суммой, что есть в базе
+    return 'enter_sum'
+
+def get_how_much_saving1(update, context):       
+    update.message.reply_text('Отлично, информацию принял!')
+    # Сложить с той суммой, что есть в базе
+    time.sleep(2)
+    update.message.reply_text('Здесь будет резюме: что он собрал и сколько осталось')
+    return ConversationHandler.END
+    
+    

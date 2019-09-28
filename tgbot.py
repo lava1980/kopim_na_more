@@ -66,7 +66,7 @@ def main():
 
     dp = mybot.dispatcher
     
-    mybot.job_queue.run_repeating(send_updates, 60, 1)    
+    mybot.job_queue.run_repeating(send_updates, 120, 1)        
 
     
     initial_data = ConversationHandler(
@@ -103,19 +103,26 @@ def main():
         entry_points = [CallbackQueryHandler(start_enter_pay_sum, pattern='yes')],
         states = {
             'payed_summ': [MessageHandler(Filters.text, get_payed_summ)],
-            'how_much_saving': []
-            
-
-
-
+            'how_much_saving': [CallbackQueryHandler(get_how_much_saving)]  
         }, 
-        fallbacks = []
+        fallbacks = [MessageHandler(Filters.text, dontknow)]
     )
 
+    enter_other_sum = ConversationHandler(
+        entry_points = [CallbackQueryHandler(get_other_sum, pattern='other')],
+        states = {
+            'enter_sum': [MessageHandler(Filters.text, get_how_much_saving1)]
+                      
+              
+        }, 
+        fallbacks = [MessageHandler(Filters.text, dontknow)]
+    )
 
+    dp.add_handler(enter_pay_sum)    
+    dp.add_handler(enter_other_sum)
     dp.add_handler(enter_secret_key)
     dp.add_handler(initial_data) 
-    dp.add_handler(enter_pay_sum)    
+    
     dp.add_handler(CommandHandler('start', greet_user))      
     
     mybot.start_polling()  
