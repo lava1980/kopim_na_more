@@ -120,11 +120,10 @@ def get_payed_summ(update, context):
 
 def get_how_much_saving(update, context):
     query = update.callback_query
-    every_month_purp_sum = get_data_cell('every_month_purp_sum', query.message.chat_id)        
+    # every_month_purp_sum = get_data_cell('every_month_purp_sum', query.message.chat_id)        
     query.message.reply_text('Отлично, информацию принял!')
-    # Сложить с той суммой, что есть в базе
-    time.sleep(2)
-    query.message.reply_text('Здесь будет резюме: что он собрал и сколько осталось')
+    # Сложить с той суммой, что есть в базе    
+    resume(update, context)
     return ConversationHandler.END
     
  
@@ -139,14 +138,15 @@ def get_other_sum(update, context):
     return 'enter_sum'
 
 def get_how_much_saving1(update, context):       
-    update.message.reply_text('Отлично, информацию принял!')
+    update.message.reply_text('Отлично, информацию принял!')    
     # Сложить с той суммой, что есть в базе
-    time.sleep(2)
-    update.message.reply_text('Здесь будет резюме: что он собрал и сколько осталось')
+    resume(update, context)
     return ConversationHandler.END
+
     
 ###########################################################
 
 def pass_current_month(update, context):
     query = update.callback_query
     query.message.reply_text('Выбрал Пропустить в этом месяце')
+    # Накопленная сумма в базе остаётся прежней

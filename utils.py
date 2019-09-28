@@ -2,7 +2,8 @@ import datetime
 import logging
 import random
 import sqlite3
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ChatAction, InlineKeyboardButton, InlineKeyboardMarkup
+import time
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s',
                     level = logging.INFO,
@@ -195,6 +196,18 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
     
     print(date_from_base)
     return date_from_base
+
+def resume(update, context):
+    text = 'Здесь будет резюме: что он собрал и сколько осталось'
+    if update.callback_query == None:
+        context.bot.send_chat_action(update.message.chat_id, ChatAction.TYPING)
+        time.sleep(2)
+        update.message.reply_text(text)
+    else: 
+        context.bot.send_chat_action(update.callback_query.message.chat_id, ChatAction.TYPING)
+        time.sleep(2)
+        update.callback_query.message.reply_text(text)
+
 
 # Сделать, чтобы когда зарплата приходится на выходной, чтобы челу потом и в выходной не 
 # приходило уведомление
