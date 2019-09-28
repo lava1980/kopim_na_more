@@ -103,23 +103,15 @@ def main():
         entry_points = [CallbackQueryHandler(start_enter_pay_sum, pattern='yes')],
         states = {
             'payed_summ': [MessageHandler(Filters.text, get_payed_summ)],
-            'how_much_saving': [CallbackQueryHandler(get_how_much_saving)]  
+            'how_much_saving': [CallbackQueryHandler(get_other_sum, pattern='other'),
+                                CallbackQueryHandler(get_how_much_saving)],
+            'enter_sum': [MessageHandler(Filters.text, get_how_much_saving1)] 
         }, 
         fallbacks = [MessageHandler(Filters.text, dontknow)]
     )
 
-    enter_other_sum = ConversationHandler(
-        entry_points = [CallbackQueryHandler(get_other_sum, pattern='other')],
-        states = {
-            'enter_sum': [MessageHandler(Filters.text, get_how_much_saving1)]
-                      
-              
-        }, 
-        fallbacks = [MessageHandler(Filters.text, dontknow)]
-    )
 
     dp.add_handler(enter_pay_sum)    
-    dp.add_handler(enter_other_sum)
     dp.add_handler(enter_secret_key)
     dp.add_handler(initial_data) 
     

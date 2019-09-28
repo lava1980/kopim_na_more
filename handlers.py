@@ -120,16 +120,13 @@ def get_payed_summ(update, context):
 
 def get_how_much_saving(update, context):
     query = update.callback_query
-    every_month_purp_sum = get_data_cell('every_month_purp_sum', query.message.chat_id)    
-    if query.data == every_month_purp_sum:
-        query.message.reply_text('Отлично, информацию принял!')
-        # Сложить с той суммой, что есть в базе
-        time.sleep(2)
-        query.message.reply_text('Здесь будет резюме: что он собрал и сколько осталось')
-        return ConversationHandler.END
-    if query.data == 'other':
-        return ConversationHandler.END
-
+    every_month_purp_sum = get_data_cell('every_month_purp_sum', query.message.chat_id)        
+    query.message.reply_text('Отлично, информацию принял!')
+    # Сложить с той суммой, что есть в базе
+    time.sleep(2)
+    query.message.reply_text('Здесь будет резюме: что он собрал и сколько осталось')
+    return ConversationHandler.END
+    
  
     
 #########################################################
