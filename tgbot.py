@@ -26,7 +26,7 @@ def send_updates(context):
     if len(subs_list) == 0:
         return False
     for subs in subs_list:
-        chat_id, dates, password = subs
+        chat_id, dates, password = subs        
         date_list = dates.split(', ')
     
         for date_from_base in date_list:
@@ -50,12 +50,19 @@ def send_updates(context):
 
 
 
+def set_delay(update, context):   
+    context.user_data.update({'chat_id': update.callback_query.message.chat_id}) 
+    mybot.job_queue.run_repeating(ask_question, 10, context=context)
+    print(context.user_data)
 
+
+
+mybot = Updater(config.TOKEN, use_context=True)
 
 def main():    
  
 
-    mybot = Updater(config.TOKEN, use_context=True)
+    
     
     # Инициализируем MessageQueue 
     mybot.bot._msg_queue = mq.MessageQueue()
@@ -118,11 +125,11 @@ def main():
         fallbacks = [MessageHandler(Filters.text, dontknow)]
     )
 
-
+  
     dp.add_handler(enter_pay_sum)    
     dp.add_handler(enter_secret_key)
     dp.add_handler(initial_data) 
-    
+    dp.add_handler(CallbackQueryHandler(set_delay, pattern='no'))   
     dp.add_handler(CommandHandler('start', greet_user))      
     
     mybot.start_polling()  

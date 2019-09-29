@@ -175,5 +175,11 @@ def pass_current_month(update, context):
 
 # TODO Сделать возможность выбирать валюту накоплений
 
-
-
+def ask_question(context):    
+    chat_id = context.job.context.user_data['chat_id']
+    context.bot.send_message(
+        chat_id=chat_id, 
+        text='Вы получили зарплату?', 
+        reply_markup=pay_day_inline_keyboard1()
+        )
+        
