@@ -30,7 +30,7 @@ def send_updates(context):
         date_list = dates.split(', ')
     
         for date_from_base in date_list:
-            date_from_base = payday_date_handler(date_from_base) # Проверяем или з/п не приходится на выходной
+            # date_from_base = payday_date_handler(date_from_base) # Проверяем или з/п не приходится на выходной
             if today_date == int(date_from_base):
                 # Основной код, который должен выполняться в день выдачи зарплаты                
                 context.bot.send_message(
@@ -105,8 +105,8 @@ def main():
             'payed_summ': [MessageHandler(Filters.text, get_payed_summ)],
             'how_much_saving': [CallbackQueryHandler(get_other_sum, pattern='other'),
                                 CallbackQueryHandler(pass_current_month, pattern='pass_current_month'),
-                                CallbackQueryHandler(get_how_much_saving)],
-            'enter_sum': [MessageHandler(Filters.text, get_how_much_saving1)] 
+                                CallbackQueryHandler(get_saving_sum)],
+            'enter_sum': [MessageHandler(Filters.text, get_other_saving_sum)] 
         }, 
         fallbacks = [MessageHandler(Filters.text, dontknow)]
     )

@@ -25,14 +25,25 @@ def pay_day_inline_keyboard1():
 
 def pay_day_inline_keyboard2(every_month_purp_sum):
     inlinekeyboard = [
-        [InlineKeyboardButton(every_month_purp_sum, callback_data=every_month_purp_sum),
-        # [InlineKeyboardButton(every_month_purp_sum, callback_data='50'),
+        [InlineKeyboardButton(every_month_purp_sum, callback_data=every_month_purp_sum),        
         InlineKeyboardButton('Другая', callback_data='other')],
         [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]
                         
                         ]
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
+
+def pay_day_inline_keyboard3(summa):
+    inlinekeyboard = [
+        [InlineKeyboardButton(summa, callback_data=summa),        
+        InlineKeyboardButton('Другая', callback_data='other')],
+        [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]
+                        
+                        ]
+    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
+    return kbd_markup
+
+
 
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
