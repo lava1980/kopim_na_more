@@ -50,10 +50,6 @@ def send_updates(context):
 
 
 
-def set_delay(update, context):   
-    context.user_data.update({'chat_id': update.callback_query.message.chat_id}) 
-    mybot.job_queue.run_repeating(ask_question, 10, context=context)
-    print(context.user_data)
 
 
 

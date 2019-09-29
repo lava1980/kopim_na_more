@@ -97,6 +97,7 @@ def get_password(update, context):
 ##################################################
 
 def start_enter_pay_sum(update, context):
+    unset(update, context)
     query = update.callback_query
     query.message.reply_text('Введите общую сумму прихода за сегодня')
     return 'payed_summ'
@@ -175,11 +176,42 @@ def pass_current_month(update, context):
 
 # TODO Сделать возможность выбирать валюту накоплений
 
-def ask_question(context):    
-    chat_id = context.job.context.user_data['chat_id']
+# def ask_question(context):    
+#     chat_id = context.job.context.user_data['chat_id']
+#     context.bot.send_message(
+#         chat_id=chat_id, 
+#         text='Вы получили зарплату?', 
+#         reply_markup=pay_day_inline_keyboard1()
+#         )
+
+def set_delay(update, context): 
+    query = update.callback_query
+    chat_id = query.message.chat_id    
+    # new_job = context.job_queue.run_repeating(ask_question, 10, context=chat_id)        
+    new_job = context.job_queue.run_once(ask_question, datetime.timedelta(seconds=10.0), context=chat_id)        
+    context.chat_data['job'] = new_job
+    query.message.reply_text('Ок, спрошу позже')    
+    print(context.user_data)
+
+def unset(update, context):
+    query = update.callback_query
+    """Remove the job if the user changed their mind."""
+    if 'job' not in context.chat_data:
+        query.message.reply_text('You have no active timer')
+        return
+
+    job = context.chat_data['job']
+    print(job)
+    job.schedule_removal()
+    del context.chat_data['job']
+
+    query.message.reply_text('Timer successfully unset!')
+
+def ask_question(context):
+    """Send the alarm message."""
+    job = context.job
     context.bot.send_message(
-        chat_id=chat_id, 
+        job.context, 
         text='Вы получили зарплату?', 
         reply_markup=pay_day_inline_keyboard1()
         )
-        
