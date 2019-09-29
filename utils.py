@@ -2,7 +2,7 @@ import datetime
 import logging
 import random
 import sqlite3
-from telegram import ChatAction, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ChatAction, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 import time
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s',
@@ -206,22 +206,51 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
     print(date_from_base)
     return date_from_base
 
-def resume(update, context):
-    text = 'Здесь будет резюме: что он собрал и сколько осталось'
+def day_to_purp(chat_id):
+    purp_date = get_data_cell('purpose_date', chat_id)
+    purp_date = datetime.datetime.strptime(purp_date, '%Y-%m-%d')
+    today = datetime.datetime.today()
+    delta = purp_date - today    
+    return delta.days
+
+def get_resume_text(update, context):
+    left_days_to_purp = day_to_purp(update.message.chat_id)
+    current_sum = int(context.user_data['current_sum'])
+    purp_sum = get_data_cell('purpose_sum', update.message.chat_id)
+    left_to_collect = purp_sum - current_sum
+    save_per_month = left_to_collect / left_days_to_purp * 30
+    save_per_month = int(round(save_per_month/5.0)*5)   
+    progres = int(round(current_sum / purp_sum * 100))
+
+    text = f'''<b>Ситуация на текущий момент:</b> 
+
+До отдыха осталось: {str(left_days_to_purp)} дней
+На сегодня собрали: {str(current_sum)}
+Осталось собрать: {str(left_to_collect)}
+
+Цель выполнена на {str(progres)}%
+
+Цель: ежемесячно откладывать не менее {str(save_per_month)}
+'''     
+    return text
+
+def resume(update, context):    
     if update.callback_query == None:
+        text = get_resume_text(update, context)
         context.bot.send_chat_action(update.message.chat_id, ChatAction.TYPING)
         time.sleep(2)
-        update.message.reply_text(text)
+        update.message.reply_text(text, parse_mode=ParseMode.HTML)
     else: 
+        text = get_resume_text(update.callback_query, context)
         context.bot.send_chat_action(update.callback_query.message.chat_id, ChatAction.TYPING)
         time.sleep(2)
-        update.callback_query.message.reply_text(text)
+        update.callback_query.message.reply_text(text, parse_mode=ParseMode.HTML)
 
 def get_little_sum(cashflow):
     litle_sum = cashflow / 100 * 5    
     if litle_sum < 5:
         litle_sum = 5
-    else: litle_sum = int(round(litle_sum/5.0)*5)    
+    else: litle_sum = int(round(litle_sum/5.0)*5)    # округляем до 5
     return litle_sum
         
 
@@ -252,7 +281,8 @@ if __name__ == "__main__":
     # payday_date_handler('30')
     # get_subscribers_send_to('3')
     # select_family_list('$DDMsf!cIzpyehr')
-    get_little_sum(259)
+    # get_little_sum(259)
+    day_to_purp('529133148')
 
 
 

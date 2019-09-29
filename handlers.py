@@ -128,14 +128,15 @@ def get_saving_sum(update, context):
     every_month_purp_sum = get_data_cell('every_month_purp_sum', query.message.chat_id)  # str
     if query.data == every_month_purp_sum or query.data == '2':    
         current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
-        current_sum = current_sum + int(every_month_purp_sum)
+        current_sum = current_sum + int(every_month_purp_sum)        
     if query.data == '1':        
         little_sum = context.user_data['little_sum']
         current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
         current_sum = current_sum + int(little_sum)
 
 
-    write_entry_to_base('current_sum', current_sum, query.message.chat_id)    
+    write_entry_to_base('current_sum', current_sum, query.message.chat_id) 
+    context.user_data.update({'current_sum': current_sum})   
     query.message.reply_text('Отлично, информацию принял!')
 
     resume(update, context)
@@ -154,7 +155,8 @@ def get_other_saving_sum(update, context):
     saving_sum = update.message.text
     current_sum = get_data_cell('current_sum', update.message.chat_id)   # int   
     current_sum = current_sum + int(saving_sum)
-    write_entry_to_base('current_sum', current_sum, update.message.chat_id)    
+    write_entry_to_base('current_sum', current_sum, update.message.chat_id) 
+    context.user_data.update({'current_sum': current_sum})      
     update.message.reply_text('Отлично, информацию принял!')    
     
     resume(update, context)
@@ -164,6 +166,8 @@ def get_other_saving_sum(update, context):
 
 def pass_current_month(update, context):
     query = update.callback_query
+    current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
+    context.user_data.update({'current_sum': current_sum})      
     query.message.reply_text('Информацию принял!')
     resume(update, context)
     return ConversationHandler.END    
