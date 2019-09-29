@@ -107,11 +107,15 @@ def get_payed_summ(update, context):
     charges = get_data_cell('charges', update.message.chat_id)
     cashflow = int(payed_summ) - charges
     if cashflow < 100:
-        litle_sum = int(round(cashflow / 100 * 5, -1))
+        little_sum = get_little_sum(cashflow)
         text = f'''В этом месяце небольшой приход. Комфортно вы можете отложить \
-столько-то. Если поднапрячься, можно выкроить и {every_month_purp_sum} долларов. \
+{str(little_sum)}. Если поднапрячься, можно выкроить и {every_month_purp_sum} долларов. \
 Какую сумму отложим?'''
-        update.message.reply_text(text, reply_markup=pay_day_inline_keyboard3(str(litle_sum))) # TODO Сюда тоже кейборд сделать
+        update.message.reply_text(
+            text, 
+            reply_markup=pay_day_inline_keyboard3(str(little_sum), every_month_purp_sum)
+            )
+        context.user_data.update({'little_sum': little_sum})
     else:        
         update.message.reply_text(
             f'Вы можете отложить {every_month_purp_sum} долларов или больше. \
@@ -119,11 +123,18 @@ def get_payed_summ(update, context):
             reply_markup=pay_day_inline_keyboard2(every_month_purp_sum))
     return 'how_much_saving'
 
-def get_saving_sum(update, context):
+def get_saving_sum(update, context):    
     query = update.callback_query
     every_month_purp_sum = get_data_cell('every_month_purp_sum', query.message.chat_id)  # str
-    current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
-    current_sum = current_sum + int(every_month_purp_sum)
+    if query.data == every_month_purp_sum or query.data == '2':    
+        current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
+        current_sum = current_sum + int(every_month_purp_sum)
+    if query.data == '1':        
+        little_sum = context.user_data['little_sum']
+        current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
+        current_sum = current_sum + int(little_sum)
+
+
     write_entry_to_base('current_sum', current_sum, query.message.chat_id)    
     query.message.reply_text('Отлично, информацию принял!')
 
@@ -158,5 +169,7 @@ def pass_current_month(update, context):
     return ConversationHandler.END    
 
 
-# TODO Добавить обработку, когда у него мало денег (инлайн-клавиатуру и пр.)
+# TODO Сделать возможность выбирать валюту накоплений
+
+
 

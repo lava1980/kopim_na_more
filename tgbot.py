@@ -105,6 +105,13 @@ def main():
             'payed_summ': [MessageHandler(Filters.text, get_payed_summ)],
             'how_much_saving': [CallbackQueryHandler(get_other_sum, pattern='other'),
                                 CallbackQueryHandler(pass_current_month, pattern='pass_current_month'),
+
+                                CallbackQueryHandler(get_saving_sum, pattern='1'),
+                                CallbackQueryHandler(get_saving_sum, pattern='2'),
+                                CallbackQueryHandler(pass_current_month, pattern='pass_current_month_2'),
+
+
+
                                 CallbackQueryHandler(get_saving_sum)],
             'enter_sum': [MessageHandler(Filters.text, get_other_saving_sum)] 
         }, 

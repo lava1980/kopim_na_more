@@ -27,17 +27,15 @@ def pay_day_inline_keyboard2(every_month_purp_sum):
     inlinekeyboard = [
         [InlineKeyboardButton(every_month_purp_sum, callback_data=every_month_purp_sum),        
         InlineKeyboardButton('Другая', callback_data='other')],
-        [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]
-                        
-                        ]
+        [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]                        ]
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
-def pay_day_inline_keyboard3(summa):
+def pay_day_inline_keyboard3(litle_summa, every_month_purp_sum):
     inlinekeyboard = [
-        [InlineKeyboardButton(summa, callback_data=summa),        
-        InlineKeyboardButton('Другая', callback_data='other')],
-        [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]
+        [InlineKeyboardButton(litle_summa, callback_data='1'),        
+        InlineKeyboardButton(every_month_purp_sum, callback_data='2')],
+        [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month_2')]
                         
                         ]
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
@@ -219,6 +217,14 @@ def resume(update, context):
         time.sleep(2)
         update.callback_query.message.reply_text(text)
 
+def get_little_sum(cashflow):
+    litle_sum = cashflow / 100 * 5    
+    if litle_sum < 5:
+        litle_sum = 5
+    else: litle_sum = int(round(litle_sum/5.0)*5)    
+    return litle_sum
+        
+
 
 # Сделать, чтобы когда зарплата приходится на выходной, чтобы челу потом и в выходной не 
 # приходило уведомление
@@ -243,9 +249,10 @@ def resume(update, context):
 
 
 if __name__ == "__main__":        
-    payday_date_handler('30')
+    # payday_date_handler('30')
     # get_subscribers_send_to('3')
     # select_family_list('$DDMsf!cIzpyehr')
+    get_little_sum(259)
 
 
 
