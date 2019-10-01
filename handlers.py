@@ -34,12 +34,23 @@ def initial_data_start(update, context):
 
 def get_purpose(update, context):
     write_entry_to_base('purpose', update.message.text, update.message.chat_id)
-    update.message.reply_text('Какую сумму хотите собрать?')    
+    update.message.reply_text(
+        'Какую сумму хотите собрать? Например, 1000 долларов... или 2000 белорусских рублей 🤔')    
     return 'purpose_sum'
 
-def get_purpose_sum(update, context):  
-    parse_purpose_sum(update.message.text, update.message.chat_id)  
-    write_entry_to_base('purpose_sum', update.message.text, update.message.chat_id)
+def get_purpose_sum(update, context):      
+    # TODO Переделать. Проверять, чтобы было цифра и одно или для слова
+    if len(update.message.text.split()) == 2 or len(update.message.text.split()) == 3:
+        for word in update.message.text.split():
+            if word.isdigit() == True:                
+                write_entry_to_base(
+                    'purpose_sum', int(word), update.message.chat_id)
+            parse_purpose_sum(word, update.message.chat_id)
+    else: 
+        update.message.reply_text('''Извините, не понимаю... \
+Напишите сумму, которую хотите накопить. Например, 1000 долларов. Цифру пишите без пробелов''')
+        return 'purpose_sum'
+    parse_purpose_sum(update.message.text, update.message.chat_id)
     update.message.reply_text('Когда планируете ехать?')
     return 'purpose_date'
 
@@ -105,24 +116,26 @@ def start_enter_pay_sum(update, context):
 
 def get_payed_summ(update, context):
     payed_summ = update.message.text    
+    currency = get_data_cell('purp_currency', update.message.chat_id)
+    context.user_data['currency'] = currency
     every_month_purp_sum = get_data_cell('every_month_purp_sum', update.message.chat_id)
     charges = get_data_cell('charges', update.message.chat_id)
     cashflow = int(payed_summ) - charges
     if cashflow < 100:
         little_sum = get_little_sum(cashflow)
         text = f'''В этом месяце небольшой приход. Комфортно вы можете отложить \
-{str(little_sum)}. Если поднапрячься, можно выкроить и {every_month_purp_sum} долларов. \
+{str(little_sum)}{currency}. Если поднапрячься, можно выкроить и {every_month_purp_sum} {currency}. \
 Какую сумму отложим?'''
         update.message.reply_text(
             text, 
-            reply_markup=pay_day_inline_keyboard3(str(little_sum), every_month_purp_sum)
+            reply_markup=pay_day_inline_keyboard3(str(little_sum), every_month_purp_sum, currency)
             )
         context.user_data.update({'little_sum': little_sum})
     else:        
         update.message.reply_text(
-            f'Вы можете отложить {every_month_purp_sum} долларов или больше. \
+            f'Вы можете отложить {every_month_purp_sum} {currency} или больше. \
 Сколько откладываем?', 
-            reply_markup=pay_day_inline_keyboard2(every_month_purp_sum))
+            reply_markup=pay_day_inline_keyboard2(every_month_purp_sum, currency))
     return 'how_much_saving'
 
 def get_saving_sum(update, context):    

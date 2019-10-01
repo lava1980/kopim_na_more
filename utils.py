@@ -25,18 +25,18 @@ def pay_day_inline_keyboard1():
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
-def pay_day_inline_keyboard2(every_month_purp_sum):
+def pay_day_inline_keyboard2(every_month_purp_sum, currency):
     inlinekeyboard = [
-        [InlineKeyboardButton(every_month_purp_sum, callback_data=every_month_purp_sum),        
+        [InlineKeyboardButton(every_month_purp_sum + ' ' + currency, callback_data=every_month_purp_sum),        
         InlineKeyboardButton('Другая', callback_data='other')],
         [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]                        ]
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
-def pay_day_inline_keyboard3(litle_summa, every_month_purp_sum):
+def pay_day_inline_keyboard3(litle_summa, every_month_purp_sum, currency):
     inlinekeyboard = [
-        [InlineKeyboardButton(litle_summa, callback_data='1'),        
-        InlineKeyboardButton(every_month_purp_sum, callback_data='2')],
+        [InlineKeyboardButton(litle_summa + ' ' + currency, callback_data='1'),        
+        InlineKeyboardButton(every_month_purp_sum + ' ' + currency, callback_data='2')],
         [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month_2')]
                         
                         ]
@@ -223,16 +223,17 @@ def get_resume_text(update, context):
     save_per_month = left_to_collect / left_days_to_purp * 30
     save_per_month = int(round(save_per_month/5.0)*5)   
     progres = int(round(current_sum / purp_sum * 100))
+    currency = context.user_data['currency']
 
     text = f'''<b>Ситуация на текущий момент:</b> 
 
 До отдыха осталось: {str(left_days_to_purp)} дней
-На сегодня собрали: {str(current_sum)}
-Осталось собрать: {str(left_to_collect)}
+На сегодня собрали: {str(current_sum)} {currency}
+Осталось собрать: {str(left_to_collect)} {currency}
 
 Цель выполнена на {str(progres)}%
 
-Цель: ежемесячно откладывать не менее {str(save_per_month)}
+Цель: ежемесячно откладывать не менее {str(save_per_month)} {currency}
 '''     
     return text
 
@@ -254,7 +255,10 @@ def get_little_sum(cashflow):
         litle_sum = 5
     else: litle_sum = int(round(litle_sum/5.0)*5)    # округляем до 5
     return litle_sum
-        
+
+
+'''ПАРСИМ ДАННЫЕ, КОТОРЫЕ ВВЁЛ ЧЕЛОВЕК'''
+
 def parse_purpose_sum(sum_text, chat_id):
     sum_text = sum_text.lower()
     for item in config.USD_SYNONIM_LIST:
@@ -273,11 +277,23 @@ def parse_purpose_sum(sum_text, chat_id):
         if item in sum_text:
             write_entry_to_base('purp_currency', 'RUB', chat_id)
             return
-    # Сделать отдельную обработку рублей -- чтобы уточнял, каких именно - русский или белорусских
+
+def parse_purp_date(date_str):
+    pass    
+
+
+
+
 
     
     
-    print(sum_text)
+    
+# TODO Не спрашивать, сколько собираетесь откладывать в месяц. 
+# Вычислять эту сумму, и предлагать ему
+    
+
+
+
 
 
 
