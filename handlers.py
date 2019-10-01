@@ -37,7 +37,8 @@ def get_purpose(update, context):
     update.message.reply_text('Какую сумму хотите собрать?')    
     return 'purpose_sum'
 
-def get_purpose_sum(update, context):    
+def get_purpose_sum(update, context):  
+    parse_purpose_sum(update.message.text, update.message.chat_id)  
     write_entry_to_base('purpose_sum', update.message.text, update.message.chat_id)
     update.message.reply_text('Когда планируете ехать?')
     return 'purpose_date'
@@ -207,3 +208,9 @@ def ask_question(context):
         text='Вы получили зарплату?', 
         reply_markup=pay_day_inline_keyboard1()
         )
+
+# Как это должно быть? ВКак мне быть с валютами? 
+# Что мне делать? Как мне быть? Как определиться? Как мне быть с валютами? 
+
+# TODO Сделать, когда вначале пользователь вводит дату, чтобы 
+# она обрабатывалась в формат базы данных.

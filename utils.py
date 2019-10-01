@@ -5,6 +5,8 @@ import sqlite3
 from telegram import ChatAction, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 import time
 
+import config
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s',
                     level = logging.INFO,
                     filename = 'tgbot.log'
@@ -253,9 +255,35 @@ def get_little_sum(cashflow):
     else: litle_sum = int(round(litle_sum/5.0)*5)    # округляем до 5
     return litle_sum
         
+def parse_purpose_sum(sum_text, chat_id):
+    sum_text = sum_text.lower()
+    for item in config.USD_SYNONIM_LIST:
+        if item in sum_text:
+            write_entry_to_base('purp_currency', 'USD', chat_id)
+            return
+    for item in config.UAH_SYNONIM_LIST:
+        if item in sum_text:
+            write_entry_to_base('purp_currency', 'UAH', chat_id)
+            return
+    for item in config.BYN_SYNONIM_LIST:
+        if item in sum_text:
+            write_entry_to_base('purp_currency', 'BYN', chat_id)
+            return
+    for item in config.RUB_SYNONIM_LIST:
+        if item in sum_text:
+            write_entry_to_base('purp_currency', 'RUB', chat_id)
+            return
+    # Сделать отдельную обработку рублей -- чтобы уточнял, каких именно - русский или белорусских
+
+    
+    
+    print(sum_text)
 
 
-# Сделать, чтобы когда зарплата приходится на выходной, чтобы челу потом и в выходной не 
+
+
+
+# TODO Сделать, чтобы когда зарплата приходится на выходной, чтобы челу потом и в выходной не 
 # приходило уведомление
 
 # def is_weekend(delta, date_from_base):
@@ -282,7 +310,8 @@ if __name__ == "__main__":
     # get_subscribers_send_to('3')
     # select_family_list('$DDMsf!cIzpyehr')
     # get_little_sum(259)
-    day_to_purp('529133148')
+    # day_to_purp('529133148')
+    parse_purpose_sum('50 ДОЛЛАРОВ')
 
 
 
