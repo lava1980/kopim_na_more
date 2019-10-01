@@ -176,13 +176,6 @@ def pass_current_month(update, context):
 
 # TODO Сделать возможность выбирать валюту накоплений
 
-# def ask_question(context):    
-#     chat_id = context.job.context.user_data['chat_id']
-#     context.bot.send_message(
-#         chat_id=chat_id, 
-#         text='Вы получили зарплату?', 
-#         reply_markup=pay_day_inline_keyboard1()
-#         )
 
 def set_delay(update, context): 
     query = update.callback_query
@@ -194,18 +187,17 @@ def set_delay(update, context):
     print(context.user_data)
 
 def unset(update, context):
-    query = update.callback_query
+    # query = update.callback_query
     """Remove the job if the user changed their mind."""
     if 'job' not in context.chat_data:
-        query.message.reply_text('You have no active timer')
+        # query.message.reply_text('You have no active timer')
         return
 
     job = context.chat_data['job']
     print(job)
     job.schedule_removal()
     del context.chat_data['job']
-
-    query.message.reply_text('Timer successfully unset!')
+    # query.message.reply_text('Timer successfully unset!')
 
 def ask_question(context):
     """Send the alarm message."""
