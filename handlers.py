@@ -18,7 +18,7 @@ def greet_user(update, context):
 блага)'''
     context.bot.send_message(chat_id=update.message.chat_id, text=text_to_user)    
     context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
-    time.sleep(3)
+    time.sleep(2)
     context.bot.send_message(
         chat_id=update.message.chat_id, 
         text='Вы новый пользователь? Или вас пригласил кто-то из вашей семьи (должен быть секретный код)?', 
@@ -39,18 +39,16 @@ def get_purpose(update, context):
     return 'purpose_sum'
 
 def get_purpose_sum(update, context):          
-    if check_user_sum_entry(update.message.text) == True:        
+    if check_user_sum_entry(update.message.text, update.message.chat_id) == True:        
         write_entry_to_base(
                     'purpose_sum', 
                     int(update.message.text.split()[0]), 
                     update.message.chat_id
-                    )    
-        parse_purpose_sum(update.message.text, update.message.chat_id)
+                    )            
     else: 
         update.message.reply_text('''Извините, не понимаю... \
 Напишите сумму, которую хотите накопить. Например, 1000 долларов. Цифру пишите без пробелов''')
-        return 'purpose_sum'
-    parse_purpose_sum(update.message.text, update.message.chat_id)
+        return 'purpose_sum'    
     update.message.reply_text('Когда планируете ехать?')
     return 'purpose_date'
 
