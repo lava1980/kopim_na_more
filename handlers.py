@@ -38,14 +38,14 @@ def get_purpose(update, context):
         'Какую сумму хотите собрать? Например, 1000 долларов... или 2000 белорусских рублей 🤔')    
     return 'purpose_sum'
 
-def get_purpose_sum(update, context):      
-    # TODO Переделать. Проверять, чтобы было цифра и одно или для слова
-    if len(update.message.text.split()) == 2 or len(update.message.text.split()) == 3:
-        for word in update.message.text.split():
-            if word.isdigit() == True:                
-                write_entry_to_base(
-                    'purpose_sum', int(word), update.message.chat_id)
-            parse_purpose_sum(word, update.message.chat_id)
+def get_purpose_sum(update, context):          
+    if check_user_sum_entry(update.message.text) == True:        
+        write_entry_to_base(
+                    'purpose_sum', 
+                    int(update.message.text.split()[0]), 
+                    update.message.chat_id
+                    )    
+        parse_purpose_sum(update.message.text, update.message.chat_id)
     else: 
         update.message.reply_text('''Извините, не понимаю... \
 Напишите сумму, которую хотите накопить. Например, 1000 долларов. Цифру пишите без пробелов''')

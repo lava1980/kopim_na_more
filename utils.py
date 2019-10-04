@@ -282,6 +282,13 @@ def parse_purp_date(date_str):
     pass    
 
 
+def check_user_sum_entry(text):
+    text = text.lower()
+    if len(text.split()) == 2 or len(text.split()) == 3:
+        if text.split()[0].isdigit() == True and text.split()[1].isdigit() == False:
+            return True
+        else: return False
+    else: return False
 
 
 
@@ -327,7 +334,8 @@ if __name__ == "__main__":
     # select_family_list('$DDMsf!cIzpyehr')
     # get_little_sum(259)
     # day_to_purp('529133148')
-    parse_purpose_sum('50 ДОЛЛАРОВ')
+    # parse_purpose_sum('50 ДОЛЛАРОВ')
+    print(check_user_sum_entry('50 000 jkjkjk'))
 
 
 
