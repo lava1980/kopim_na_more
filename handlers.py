@@ -49,13 +49,18 @@ def get_purpose_sum(update, context):
         update.message.reply_text('''Извините, не понимаю... \
 Напишите сумму, которую хотите накопить. Например, 1000 долларов. Цифру пишите без пробелов''')
         return 'purpose_sum'    
-    update.message.reply_text('Когда планируете ехать?')
+    update.message.reply_text('Когда планируете ехать? Например, 1 августа')
     return 'purpose_date'
 
-def get_purpose_date(update, context):    
-    write_entry_to_base('purpose_date', update.message.text, update.message.chat_id)
-    update.message.reply_text('Сколько денег есть на данный момент?')
-    return 'current_sum'
+def get_purpose_date(update, context):       
+    purpose_date = parse_purp_date(update.message.text) 
+    if purpose_date != -1:
+        write_entry_to_base('purpose_date', purpose_date, update.message.chat_id)
+        update.message.reply_text('Сколько денег есть на данный момент?')
+        return 'current_sum'
+    else: 
+        update.message.reply_text('Введите дату в правильном формате, например, 1 августа... или 1 августа 2022 года')
+        return 'purpose_date'
 
 def get_current_sum(update, context):    
     write_entry_to_base('current_sum', update.message.text, update.message.chat_id)
