@@ -259,38 +259,33 @@ def get_little_sum(cashflow):
 
 '''ПАРСИМ ДАННЫЕ, КОТОРЫЕ ВВЁЛ ЧЕЛОВЕК'''
 
-def parse_purpose_sum(sum_text, chat_id):
-    sum_text = sum_text.lower()
-    for item in config.USD_SYNONIM_LIST:
-        if item in sum_text:
-            write_entry_to_base('purp_currency', 'USD', chat_id)
-            return
-    for item in config.UAH_SYNONIM_LIST:
-        if item in sum_text:
-            write_entry_to_base('purp_currency', 'UAH', chat_id)
-            return
-    for item in config.BYN_SYNONIM_LIST:
-        if item in sum_text:
-            write_entry_to_base('purp_currency', 'BYN', chat_id)
-            return
-    for item in config.RUB_SYNONIM_LIST:
-        if item in sum_text:
-            write_entry_to_base('purp_currency', 'RUB', chat_id)
-            return
-
-def parse_purp_date(date_str):
-    pass    
-
-
-def check_user_sum_entry(text):
+def check_user_sum_entry(text, chat_id):
     text = text.lower()
     if len(text.split()) == 2 or len(text.split()) == 3:
         if text.split()[0].isdigit() == True and text.split()[1].isdigit() == False:
-            return True
+            for item in config.USD_SYNONIM_LIST:
+                if item in text:
+                    write_entry_to_base('purp_currency', 'USD', chat_id)
+                    return True
+            for item in config.UAH_SYNONIM_LIST:
+                if item in text:
+                    write_entry_to_base('purp_currency', 'UAH', chat_id)
+                    return True
+            for item in config.BYN_SYNONIM_LIST:
+                if item in text:
+                    write_entry_to_base('purp_currency', 'BYN', chat_id)
+                    return True
+            for item in config.RUB_SYNONIM_LIST:
+                if item in text:
+                    write_entry_to_base('purp_currency', 'RUB', chat_id)
+                    return True
+                return False
         else: return False
     else: return False
 
 
+def parse_purp_date(date_str):
+    pass    
 
     
     
