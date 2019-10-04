@@ -283,11 +283,49 @@ def check_user_sum_entry(text, chat_id):
         else: return False
     else: return False
 
+def date_to_sql_format(word_list, month_list):
+    day, month, year = word_list
+    for month_item in month_list:
+        if month_item in month:
+            month = str(month_list.index(month_item) + 1)
+    purp_date = datetime.datetime.strptime(f'{year}-{month}-{day}', '%Y-%m-%d').date()    
+    return purp_date
+    
 
 def parse_purp_date(date_str):
-    pass    
+    date_str = date_str.lower()
+    month_list = ['январ', 'феврал', 'март', 'апрел', 'мая', 'июн', 'июл', 'август', 'сентяб', 'октябр', 'ноябр', 'декабр']
+    word_list = date_str.split()
+    if len(word_list) > 1 and word_list[0].isdigit() == True and int(word_list[0]) < 32 and word_list[1].isdigit() == False:
+        if len(word_list) == 3:
+            purp_date = date_to_sql_format(word_list, month_list)
+            return purp_date
+        elif len(word_list) == 4:
+            del word_list[-1]
+            purp_date = date_to_sql_format(word_list, month_list)
+            return purp_date
+        elif len(word_list) == 2:
+            year = str(datetime.datetime.today().year)
+            word_list.append(year)
+            purp_date = date_to_sql_format(word_list, month_list)
+            delta = purp_date - datetime.date.today()
+            if delta.days < 0:
+                year = str(datetime.datetime.today().year + 1)
+                del word_list[-1]
+                word_list.append(year)
+                purp_date = date_to_sql_format(word_list, month_list)
+                print(purp_date)
+                return purp_date
+            else: return purp_date    
+        else: return -1
+    else: return -1
 
-    
+
+        
+        
+
+        
+
     
     
 # TODO Не спрашивать, сколько собираетесь откладывать в месяц. 
@@ -323,14 +361,16 @@ def parse_purp_date(date_str):
 
 
 
-if __name__ == "__main__":        
+if __name__ == '__main__':
+    parse_purp_date('32 октября')            
     # payday_date_handler('30')
     # get_subscribers_send_to('3')
     # select_family_list('$DDMsf!cIzpyehr')
     # get_little_sum(259)
     # day_to_purp('529133148')
     # parse_purpose_sum('50 ДОЛЛАРОВ')
-    print(check_user_sum_entry('50 000 jkjkjk'))
+    # print(check_user_sum_entry('50 000 jkjkjk'))
+
 
 
 
