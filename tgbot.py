@@ -76,7 +76,7 @@ def main():
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
                 'current_sum': [MessageHandler(Filters.text, get_current_sum)],
                 'payday_dates': [MessageHandler(Filters.text, get_payday_dates)],
-                'every_month_purp_sum': [MessageHandler(Filters.text, get_every_month_purp_sum)]                                               
+                'salary_currency': [CallbackQueryHandler(get_salary_currency)]                                               
                     
         },
         fallbacks = [MessageHandler(Filters.text, dontknow)]

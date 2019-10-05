@@ -19,6 +19,17 @@ def get_inline_keyboard():
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
+def inline_keyboard_currency():
+    inlinekeyboard = [[InlineKeyboardButton('RUB', callback_data='RUB'),
+                        InlineKeyboardButton('UAH', callback_data='UAH'), 
+                        InlineKeyboardButton('BYN', callback_data='BYN'), 
+                        InlineKeyboardButton('USD', callback_data='USD')]]
+    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
+    return kbd_markup
+
+
+
+
 def pay_day_inline_keyboard1():
     inlinekeyboard = [[InlineKeyboardButton('Да', callback_data='yes'),
                         InlineKeyboardButton('Нет', callback_data='no')]]

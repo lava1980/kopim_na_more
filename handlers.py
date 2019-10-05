@@ -82,17 +82,18 @@ def get_payday_dates(update, context):
     if dates == 'payday_dates':
         return 'payday_dates'
     write_entry_to_base('payday_dates', dates, update.message.chat_id)
-    update.message.reply_text('Сколько планируете откладывать в месяц?')
-    return 'every_month_purp_sum'
+    update.message.reply_text('В какой валюте получаете зарплату?', reply_markup=inline_keyboard_currency())
+    return 'salary_currency'
 
-def get_every_month_purp_sum(update, context):    
-    write_entry_to_base('every_month_purp_sum', update.message.text, update.message.chat_id)
-    update.message.reply_text('Спасибо, ответы принял.')
-    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)    
+def get_salary_currency(update, context):  
+    query = update.callback_query
+    write_entry_to_base('salary_currency', query.data, query.message.chat_id)  
+    query.message.reply_text('Спасибо, ответы принял.')
+    context.bot.send_chat_action(chat_id=query.message.chat_id, action=ChatAction.TYPING)    
     password = password_generation()
-    write_entry_to_base('secret_key', password, update.message.chat_id)
-    update.message.reply_text('Пароль вашей семьи: ' + password)
-    update.message.reply_text('Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю историю.')
+    write_entry_to_base('secret_key', password, query.message.chat_id)
+    query.message.reply_text('Пароль вашей семьи: ' + password)
+    query.message.reply_text('Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю историю.')
     return ConversationHandler.END   
 
 def dontknow(update, context):
