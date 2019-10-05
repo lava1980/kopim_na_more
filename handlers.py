@@ -29,7 +29,7 @@ def initial_data_start(update, context):
     query = update.callback_query
     data = get_initial_data(update)
     write_initial_data_to_base(data)
-    query.message.reply_text('На что копим?')
+    query.message.reply_text('На что копим? Пример: Отдых в Сочи')
     return 'purpose'
 
 def get_purpose(update, context):
@@ -39,7 +39,7 @@ def get_purpose(update, context):
     return 'purpose_sum'
 
 def get_purpose_sum(update, context):          
-    if check_user_sum_entry(update.message.text, update.message.chat_id) == True:        
+    if check_user_sum_entry(update.message.text, update.message.chat_id, context) == True:        
         write_entry_to_base(
                     'purpose_sum', 
                     int(update.message.text.split()[0]), 
@@ -56,16 +56,25 @@ def get_purpose_date(update, context):
     purpose_date = parse_purp_date(update.message.text) 
     if purpose_date != -1:
         write_entry_to_base('purpose_date', purpose_date, update.message.chat_id)
-        update.message.reply_text('Сколько денег есть на данный момент?')
+        purp_currency = context.user_data['purp_currency']
+        update.message.reply_text(f'Сколько денег есть на данный момент (в {purp_currency})?')
         return 'current_sum'
     else: 
         update.message.reply_text('Введите дату в правильном формате, например, 1 августа... или 1 августа 2022 года')
         return 'purpose_date'
 
-def get_current_sum(update, context):    
-    write_entry_to_base('current_sum', update.message.text, update.message.chat_id)
-    update.message.reply_text('В какие дни у вас приход денег?')
-    return 'payday_dates'
+def get_current_sum(update, context):  
+    current_summ = parse_current_sum(update.message.text, context)
+    if current_summ != -1:
+        write_entry_to_base('current_sum', current_summ, update.message.chat_id)
+        update.message.reply_text('В какие дни у вас приход денег?')
+        return 'payday_dates'
+    else:
+        purp_currency = context.user_data['purp_currency']
+        update.message.reply_text(
+            f'Введите или цифру, или цифру и валюту, например, 50 долларов. Обратите внимание, что валюта должна совпадать с валютой цели (в вашем случае {purp_currency}).'
+            )
+        return 'current_sum'
 
 def get_payday_dates(update, context):   
     context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)

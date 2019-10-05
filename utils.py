@@ -259,25 +259,29 @@ def get_little_sum(cashflow):
 
 '''ПАРСИМ ДАННЫЕ, КОТОРЫЕ ВВЁЛ ЧЕЛОВЕК'''
 
-def check_user_sum_entry(text, chat_id):
+def check_user_sum_entry(text, chat_id, context):
     text = text.lower()
     if len(text.split()) == 2 or len(text.split()) == 3:
         if text.split()[0].isdigit() == True and text.split()[1].isdigit() == False:
             for item in config.USD_SYNONIM_LIST:
                 if item in text:
                     write_entry_to_base('purp_currency', 'USD', chat_id)
+                    context.user_data['purp_currency'] = 'USD'
                     return True
             for item in config.UAH_SYNONIM_LIST:
                 if item in text:
                     write_entry_to_base('purp_currency', 'UAH', chat_id)
+                    context.user_data['purp_currency'] = 'UAH'
                     return True
             for item in config.BYN_SYNONIM_LIST:
                 if item in text:
                     write_entry_to_base('purp_currency', 'BYN', chat_id)
+                    context.user_data['purp_currency'] = 'BYN'
                     return True
             for item in config.RUB_SYNONIM_LIST:
                 if item in text:
                     write_entry_to_base('purp_currency', 'RUB', chat_id)
+                    context.user_data['purp_currency'] = 'RUB'
                     return True
                 return False
         else: return False
@@ -289,8 +293,7 @@ def date_to_sql_format(word_list, month_list):
         if month_item in month:
             month = str(month_list.index(month_item) + 1)
     purp_date = datetime.datetime.strptime(f'{year}-{month}-{day}', '%Y-%m-%d').date()    
-    return purp_date
-    
+    return purp_date    
 
 def parse_purp_date(date_str):
     date_str = date_str.lower()
@@ -320,10 +323,33 @@ def parse_purp_date(date_str):
         else: return -1
     else: return -1
 
+def parse_current_sum(summ, context):
+    if len(summ.split()) == 1:
+        if summ.isdigit() == True:
+            return summ
+        else: return -1
+    elif len(summ.split()) == 2:
+        if summ.split()[0].isdigit() == True and summ.split()[1].isdigit() == False:
+            purp_cur = context.user_data['purp_currency']
+            if context.user_data['purp_currency'] == 'USD':
+                synonim_list = config.USD_SYNONIM_LIST
+            if context.user_data['purp_currency'] == 'UAH':
+                synonim_list = config.UAH_SYNONIM_LIST
+            if context.user_data['purp_currency'] == 'RUB':
+                synonim_list = config.RUB_SYNONIM_LIST
+            if context.user_data['purp_currency'] == 'BYN':
+                synonim_list = config.BYN_SYNONIM_LIST
+            for word in synonim_list:
+                if word in summ:
+                    return summ.split()[0]
+            else: return -1
+    else: return -1
+        
 
+
+    
         
         
-
         
 
     
