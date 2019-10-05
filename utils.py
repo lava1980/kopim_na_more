@@ -54,8 +54,6 @@ def pay_day_inline_keyboard3(litle_summa, every_month_purp_sum, currency):
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
-
-
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
@@ -159,14 +157,6 @@ def get_subscribers_send_to(date_str): # '11'
             subs_list_send_to.append(subscriber)
     print(list(subs_list_send_to))
     return subs_list_send_to # [('891850606', '2, 1, 13', '-yGIB7rf?NKU0Dk')]
-
-
-    
-
-
-
-
-
 
 def password_generation():
     chars = '+-/*!&$#?=@<>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
@@ -340,8 +330,7 @@ def parse_current_sum(summ, context):
             return summ
         else: return -1
     elif len(summ.split()) == 2:
-        if summ.split()[0].isdigit() == True and summ.split()[1].isdigit() == False:
-            purp_cur = context.user_data['purp_currency']
+        if summ.split()[0].isdigit() == True and summ.split()[1].isdigit() == False:            
             if context.user_data['purp_currency'] == 'USD':
                 synonim_list = config.USD_SYNONIM_LIST
             if context.user_data['purp_currency'] == 'UAH':
@@ -358,42 +347,17 @@ def parse_current_sum(summ, context):
         
 
 
-    
-        
-        
-        
+# TODO Поделить предложение отложить сумму на число приходов. Чтобы если в этот 
+# месяц ему надо отложить 80 долларов, то ему предлагались варианты: 20, 25, 35
 
-    
-    
-# TODO Не спрашивать, сколько собираетесь откладывать в месяц. 
-# Вычислять эту сумму, и предлагать ему
-    
+# TODO Сделать пересчёт зарплаты в валюту накопления... предлагать в валюте накопления
 
-
-
-
-
-
-
+# TODO Сделать, чтобы люди могли редактировать свои данные (и обновлялась база)
 
 # TODO Сделать, чтобы когда зарплата приходится на выходной, чтобы челу потом и в выходной не 
 # приходило уведомление
 
-# def is_weekend(delta, date_from_base):
-#     date = datetime.date.today() + datetime.timedelta(days=delta)
-#     date_day = date.day # 27
-#     day_of_week = date.isoweekday() # 5
-#     if int(date_from_base) == date_day:
-#         if day_of_week == 6:
-#             print('День выдачи з/п приходится на выходной.')
-#             return True
-
-
-
-
-
-
-# Сделаю автоматический забор суммы для нас, а для остальных 
+# TODO Сделаю автоматический забор суммы для нас, а для остальных 
 # предусмотрю возможность ввести приход в день прихода. 
 
 
@@ -407,11 +371,3 @@ if __name__ == '__main__':
     # day_to_purp('529133148')
     # parse_purpose_sum('50 ДОЛЛАРОВ')
     # print(check_user_sum_entry('50 000 jkjkjk'))
-
-
-
-
-# TODO Сделать при выборе команды НАСТРОЙКИ, чтобы спрашивал: "новый пользователь" и "меня пригласили".
-# Если пригласили, то предлагает ввести логин и пароль.
-
-# TODO Сделать, чтобы люди могли редактировать свои данные (и обновлялась база)

@@ -149,7 +149,7 @@ def get_payed_summ(update, context):
     if cashflow < 100:
         little_sum = get_little_sum(cashflow)
         text = f'''В этом месяце небольшой приход. Комфортно вы можете отложить \
-{str(little_sum)}{currency}. Если поднапрячься, можно выкроить и {str(every_month_purp_sum)} {currency}. \
+{str(little_sum)}{currency}. Рекомендуемая сумма, чтобы не выбиться из графика — {str(every_month_purp_sum)} {currency}. \
 Какую сумму отложим?'''
         update.message.reply_text(
             text, 
@@ -192,10 +192,7 @@ def get_other_sum(update, context):
 
 def get_other_saving_sum(update, context):   
     saving_sum = update.message.text
-    # TODO Проверить этот вариант, чтобы было корректное значение current_sum
-    # current_sum = get_data_cell('current_sum', update.message.chat_id)   # int   
     current_sum = context.user_data['current_sum']
-
     current_sum = int(current_sum) + int(saving_sum)
     write_entry_to_base('current_sum', current_sum, update.message.chat_id)     
     context.user_data['current_sum'] = str(current_sum)
@@ -207,14 +204,10 @@ def get_other_saving_sum(update, context):
 ###########################################################
 
 def pass_current_month(update, context):
-    query = update.callback_query
-    # TODO И здесь проверить, чтобы были корректные данные        
+    query = update.callback_query    
     query.message.reply_text('Информацию принял!')
     resume(update, context)
     return ConversationHandler.END    
-
-
-# TODO Сделать возможность выбирать валюту накоплений
 
 
 def set_delay(update, context): 
@@ -247,18 +240,3 @@ def ask_question(context):
         text='Вы получили зарплату?', 
         reply_markup=pay_day_inline_keyboard1()
         )
-
-# Как это должно быть? ВКак мне быть с валютами? 
-# Что мне делать? Как мне быть? Как определиться? Как мне быть с валютами? 
-
-# TODO Сделать, когда вначале пользователь вводит дату, чтобы 
-# она обрабатывалась в формат базы данных.
-
-
-# Что мне надо сделать? 
-
-# В какой момент мне надо эта информация? Инфа о том, сколько отложить в месяц?
-# в момент формирования кнопока. 
-
-
-# Т.е. 
