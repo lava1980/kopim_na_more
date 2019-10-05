@@ -128,43 +128,54 @@ def start_enter_pay_sum(update, context):
     return 'payed_summ'
 
 def get_payed_summ(update, context):
+    left_days_to_purp = day_to_purp(update.message.chat_id)
+    context.user_data['left_days_to_purp'] = str(left_days_to_purp)
+
+    purp_sum = get_data_cell('purpose_sum', update.message.chat_id)
+    context.user_data['purpose_sum'] = str(purp_sum)
+    
+    current_sum = get_data_cell('current_sum', update.message.chat_id)   # int 
+    context.user_data['current_sum'] = str(current_sum)
+
+    every_month_purp_sum = (purp_sum - current_sum) / left_days_to_purp * 30
+    every_month_purp_sum = int(round(every_month_purp_sum/5.0)*5) 
+    context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
+    
     payed_summ = update.message.text    
     currency = get_data_cell('purp_currency', update.message.chat_id)
-    context.user_data['currency'] = currency
-    every_month_purp_sum = get_data_cell('every_month_purp_sum', update.message.chat_id)
+    context.user_data['currency'] = currency    
     charges = get_data_cell('charges', update.message.chat_id)
     cashflow = int(payed_summ) - charges
     if cashflow < 100:
         little_sum = get_little_sum(cashflow)
         text = f'''В этом месяце небольшой приход. Комфортно вы можете отложить \
-{str(little_sum)}{currency}. Если поднапрячься, можно выкроить и {every_month_purp_sum} {currency}. \
+{str(little_sum)}{currency}. Если поднапрячься, можно выкроить и {str(every_month_purp_sum)} {currency}. \
 Какую сумму отложим?'''
         update.message.reply_text(
             text, 
-            reply_markup=pay_day_inline_keyboard3(str(little_sum), every_month_purp_sum, currency)
+            reply_markup=pay_day_inline_keyboard3(str(little_sum), str(every_month_purp_sum), currency)
             )
         context.user_data.update({'little_sum': little_sum})
     else:        
         update.message.reply_text(
-            f'Вы можете отложить {every_month_purp_sum} {currency} или больше. \
+            f'Вы можете отложить {str(every_month_purp_sum)} {currency} или больше. \
 Сколько откладываем?', 
-            reply_markup=pay_day_inline_keyboard2(every_month_purp_sum, currency))
+            reply_markup=pay_day_inline_keyboard2(str(every_month_purp_sum), currency))
     return 'how_much_saving'
 
 def get_saving_sum(update, context):    
     query = update.callback_query
-    every_month_purp_sum = get_data_cell('every_month_purp_sum', query.message.chat_id)  # str
+    every_month_purp_sum = context.user_data['every_month_purp_sum']
     if query.data == every_month_purp_sum or query.data == '2':    
-        current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
-        current_sum = current_sum + int(every_month_purp_sum)        
+        current_sum = int(context.user_data['current_sum'])
+        current_sum = current_sum + int(every_month_purp_sum)         
     if query.data == '1':        
         little_sum = context.user_data['little_sum']
-        current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
-        current_sum = current_sum + int(little_sum)
-
+        current_sum = int(context.user_data['current_sum'])
+        current_sum = current_sum + int(little_sum)        
 
     write_entry_to_base('current_sum', current_sum, query.message.chat_id) 
-    context.user_data.update({'current_sum': current_sum})   
+    context.user_data['current_sum'] = str(current_sum)
     query.message.reply_text('Отлично, информацию принял!')
 
     resume(update, context)
@@ -181,10 +192,13 @@ def get_other_sum(update, context):
 
 def get_other_saving_sum(update, context):   
     saving_sum = update.message.text
-    current_sum = get_data_cell('current_sum', update.message.chat_id)   # int   
-    current_sum = current_sum + int(saving_sum)
-    write_entry_to_base('current_sum', current_sum, update.message.chat_id) 
-    context.user_data.update({'current_sum': current_sum})      
+    # TODO Проверить этот вариант, чтобы было корректное значение current_sum
+    # current_sum = get_data_cell('current_sum', update.message.chat_id)   # int   
+    current_sum = context.user_data['current_sum']
+
+    current_sum = int(current_sum) + int(saving_sum)
+    write_entry_to_base('current_sum', current_sum, update.message.chat_id)     
+    context.user_data['current_sum'] = str(current_sum)
     update.message.reply_text('Отлично, информацию принял!')    
     
     resume(update, context)
@@ -194,8 +208,7 @@ def get_other_saving_sum(update, context):
 
 def pass_current_month(update, context):
     query = update.callback_query
-    current_sum = get_data_cell('current_sum', query.message.chat_id)   # int   
-    context.user_data.update({'current_sum': current_sum})      
+    # TODO И здесь проверить, чтобы были корректные данные        
     query.message.reply_text('Информацию принял!')
     resume(update, context)
     return ConversationHandler.END    
@@ -240,3 +253,12 @@ def ask_question(context):
 
 # TODO Сделать, когда вначале пользователь вводит дату, чтобы 
 # она обрабатывалась в формат базы данных.
+
+
+# Что мне надо сделать? 
+
+# В какой момент мне надо эта информация? Инфа о том, сколько отложить в месяц?
+# в момент формирования кнопока. 
+
+
+# Т.е. 

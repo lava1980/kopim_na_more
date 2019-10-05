@@ -227,9 +227,9 @@ def day_to_purp(chat_id):
     return delta.days
 
 def get_resume_text(update, context):
-    left_days_to_purp = day_to_purp(update.message.chat_id)
+    left_days_to_purp = int(context.user_data['left_days_to_purp'])
     current_sum = int(context.user_data['current_sum'])
-    purp_sum = get_data_cell('purpose_sum', update.message.chat_id)
+    purp_sum = int(context.user_data['purpose_sum'])
     left_to_collect = purp_sum - current_sum
     save_per_month = left_to_collect / left_days_to_purp * 30
     save_per_month = int(round(save_per_month/5.0)*5)   
