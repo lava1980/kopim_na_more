@@ -38,9 +38,9 @@ def pay_day_inline_keyboard1():
 
 def pay_day_inline_keyboard2(every_month_purp_sum, currency):
     inlinekeyboard = [
-        [InlineKeyboardButton(every_month_purp_sum + ' ' + currency, callback_data=every_month_purp_sum),        
+        [InlineKeyboardButton(str(every_month_purp_sum) + ' ' + currency, callback_data=str(every_month_purp_sum)),        
         InlineKeyboardButton('Другая', callback_data='other')],
-        [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month')]                        ]
+        [InlineKeyboardButton('Пропустить', callback_data='pass_current_month')]                        ]
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
@@ -48,7 +48,7 @@ def pay_day_inline_keyboard3(litle_summa, every_month_purp_sum, currency):
     inlinekeyboard = [
         [InlineKeyboardButton(litle_summa + ' ' + currency, callback_data='1'),        
         InlineKeyboardButton(every_month_purp_sum + ' ' + currency, callback_data='2')],
-        [InlineKeyboardButton('Пропустить этот месяц', callback_data='pass_current_month_2')]
+        [InlineKeyboardButton('Пропустить', callback_data='pass_current_month_2')]
                         
                         ]
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
@@ -134,6 +134,20 @@ def select_family_list(password):
     conn.commit()
     conn.close()        
     print(date_list)   
+    return date_list
+
+def select_user_data(chat_id):
+    conn = sqlite3.connect('user_base.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        f'SELECT purpose_sum, purpose_date, current_sum, charges, \
+payday_dates, secret_key, purp_currency, salary_currency, save_in_this_month \
+FROM users WHERE chat_id=?', 
+        (chat_id,))
+    date_list = cursor.fetchall()
+    conn.commit()
+    conn.close()        
+    print(date_list[0])   
     return date_list
 
 
@@ -345,6 +359,16 @@ def parse_current_sum(summ, context):
             else: return -1
     else: return -1
         
+def split_every_month_saved_sum(summ, count_payed_days):
+    pass
+
+
+    
+    
+
+# 100
+# 25 35 40
+
 
 
 # TODO Поделить предложение отложить сумму на число приходов. Чтобы если в этот 
@@ -361,9 +385,29 @@ def parse_current_sum(summ, context):
 # предусмотрю возможность ввести приход в день прихода. 
 
 
+# Вот у него день прихода. Он получил 1000 рублей. Что мне делать? 
+
+# Я знаю, что у него будет ещё два прихода. И что? Надо проверить, сколько ему надо по 
+# графику. 
+
+# И минусовать эту сумму, что он отложит.
+
+# Но это же для одного дня прихода. Я не знаю, какие приходы будут у него потом. 
+# Все эти расчёты только для одного текущего дня прихода. В этом сложность. 
+
+
+
+# А можно поступить ещё проще. У меня есть сумма которую надо накопить. У меня есть
+# число приходов. Я просто предлагаю ему отложить сумму, поделенную на число приходов. 
+
+# Например, ему надо отложить 80 долларов в том месяце. Всего 3 прихода. Тогда в первый приход я 
+# предлагаю отложить 80/3 = 25 рублей
+
+
+
 
 if __name__ == '__main__':
-    parse_purp_date('32 октября')            
+    # parse_purp_date('32 октября')            
     # payday_date_handler('30')
     # get_subscribers_send_to('3')
     # select_family_list('$DDMsf!cIzpyehr')
@@ -371,3 +415,4 @@ if __name__ == '__main__':
     # day_to_purp('529133148')
     # parse_purpose_sum('50 ДОЛЛАРОВ')
     # print(check_user_sum_entry('50 000 jkjkjk'))
+    select_user_data('529133148')

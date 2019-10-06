@@ -128,6 +128,12 @@ def start_enter_pay_sum(update, context):
     return 'payed_summ'
 
 def get_payed_summ(update, context):
+    # TODO Сделать один запрос из базы, чтобы сразу 
+    # все нужные значения подтягивались
+    purpose_sum, purpose_date, current_sum, charges, payday_dates, \
+        secret_key, purp_currency, salary_currency, save_in_this_month = \
+            select_user_data(update.message.chat_id)
+
     left_days_to_purp = day_to_purp(update.message.chat_id)
     context.user_data['left_days_to_purp'] = str(left_days_to_purp)
 
@@ -137,9 +143,23 @@ def get_payed_summ(update, context):
     current_sum = get_data_cell('current_sum', update.message.chat_id)   # int 
     context.user_data['current_sum'] = str(current_sum)
 
-    every_month_purp_sum = (purp_sum - current_sum) / left_days_to_purp * 30
+    payed_dates = get_data_cell('payday_dates', update.message.chat_id)
+    context.user_data['payed_dates'] = payed_dates
+    payed_dates = payed_dates.split(', ')
+
+    save_in_this_month = get_data_cell('save_in_this_month', update.message.chat_id)   # int 
+    context.user_data['save_in_this_month'] = str(save_in_this_month)
+
+    every_month_purp_sum_all = (purp_sum - current_sum) / left_days_to_purp * 30
+    every_month_purp_sum_all = int(round(every_month_purp_sum_all/5.0)*5) 
+
+    every_month_purp_sum_split = (purp_sum - current_sum) / left_days_to_purp * 30 / len(payed_dates)
+    every_month_purp_sum = every_month_purp_sum_split - save_in_this_month
     every_month_purp_sum = int(round(every_month_purp_sum/5.0)*5) 
     context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
+
+
+    
     
     payed_summ = update.message.text    
     currency = get_data_cell('purp_currency', update.message.chat_id)
@@ -149,32 +169,43 @@ def get_payed_summ(update, context):
     if cashflow < 100:
         little_sum = get_little_sum(cashflow)
         text = f'''В этом месяце небольшой приход. Комфортно вы можете отложить \
-{str(little_sum)}{currency}. Рекомендуемая сумма, чтобы не выбиться из графика — {str(every_month_purp_sum)} {currency}. \
+{str(little_sum)} {currency}. Рекомендуемая сумма, чтобы не выбиться из графика — {str(every_month_purp_sum)} {currency}. \
 Какую сумму отложим?'''
         update.message.reply_text(
             text, 
             reply_markup=pay_day_inline_keyboard3(str(little_sum), str(every_month_purp_sum), currency)
             )
         context.user_data.update({'little_sum': little_sum})
-    else:        
+    else:
+        if save_in_this_month == 0:
+            how_much_saving_text = ''
+        else: how_much_saving_text = f'Вы отложили {save_in_this_month} {currency}.' 
         update.message.reply_text(
-            f'Вы можете отложить {str(every_month_purp_sum)} {currency} или больше. \
+            f'В этом месяце по графику вам нужно сохранить {every_month_purp_sum_all} {currency}. \
+{how_much_saving_text} Сейчас нужно отложить {str(every_month_purp_sum)} {currency} или больше. \
 Сколько откладываем?', 
-            reply_markup=pay_day_inline_keyboard2(str(every_month_purp_sum), currency))
+            reply_markup=pay_day_inline_keyboard2(every_month_purp_sum, currency))
     return 'how_much_saving'
 
 def get_saving_sum(update, context):    
     query = update.callback_query
     every_month_purp_sum = context.user_data['every_month_purp_sum']
+    save_in_this_month = int(context.user_data['save_in_this_month'])
     if query.data == every_month_purp_sum or query.data == '2':    
         current_sum = int(context.user_data['current_sum'])
-        current_sum = current_sum + int(every_month_purp_sum)         
+        current_sum = current_sum + int(every_month_purp_sum)             
+        save_in_this_month = save_in_this_month + int(every_month_purp_sum)
+
     if query.data == '1':        
         little_sum = context.user_data['little_sum']
         current_sum = int(context.user_data['current_sum'])
-        current_sum = current_sum + int(little_sum)        
+        current_sum = current_sum + int(little_sum)   
+        save_in_this_month = save_in_this_month + int(little_sum)
+
+
 
     write_entry_to_base('current_sum', current_sum, query.message.chat_id) 
+    write_entry_to_base('save_in_this_month', every_month_purp_sum, query.message.chat_id)
     context.user_data['current_sum'] = str(current_sum)
     query.message.reply_text('Отлично, информацию принял!')
 
@@ -191,10 +222,15 @@ def get_other_sum(update, context):
     return 'enter_sum'
 
 def get_other_saving_sum(update, context):   
-    saving_sum = update.message.text
+    saving_sum = int(update.message.text)
     current_sum = context.user_data['current_sum']
     current_sum = int(current_sum) + int(saving_sum)
+    
+    save_in_this_month = int(context.user_data['save_in_this_month'])
+    save_in_this_month = save_in_this_month + saving_sum
+
     write_entry_to_base('current_sum', current_sum, update.message.chat_id)     
+    write_entry_to_base('save_in_this_month', save_in_this_month, update.message.chat_id)
     context.user_data['current_sum'] = str(current_sum)
     update.message.reply_text('Отлично, информацию принял!')    
     
@@ -209,6 +245,7 @@ def pass_current_month(update, context):
     resume(update, context)
     return ConversationHandler.END    
 
+###########################################################   
 
 def set_delay(update, context): 
     query = update.callback_query
@@ -240,3 +277,36 @@ def ask_question(context):
         text='Вы получили зарплату?', 
         reply_markup=pay_day_inline_keyboard1()
         )
+
+
+
+# Вот мне известна сумма, которую он должен отложить, чтобы не выбиться из графика. 
+
+# Я знаю, сколько раз у него приход. И что? Я из этой суммы создаю три суммы -- с разным 
+# процентом от этой общей суммы. 
+
+# Как мне понимать, сколько раз он уже вносил сумму? По номеру даты в списке. 
+# Т.е. у нас отсортированный список чисел.
+
+# Мы его превращаем в список, и от того какой по счёту в этом списке стоит текущая дата, 
+# мы понимаем, какой по счёту это приход. 
+
+# 1-й приход -- мы предлагаем число вариантов отложения, равное числу приходов. Например, 3
+# кнопки. 
+
+# 2-й приход -- число вариантов на один меньше. 
+
+# 3-приход -- один вариант -- оставшаяся сумма. 
+
+# где хранить эти суммы? Даты между ними могут быть достаточно большими, продолжительными. Как
+# тут быть? В базе, в виде строки. Так же как и даты. 
+
+
+
+
+# Узнать какой сегодня день -- цифру
+
+# Узнать индекс этой цифры в списке дат. 
+
+# Если индекс равен 0, то делаем вычисления суммы и записываем её в базу
+# Если не равен нулу, то не делаем вычисления и не записываем в базу

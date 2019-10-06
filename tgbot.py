@@ -26,7 +26,7 @@ def send_updates(context):
     if len(subs_list) == 0:
         return False
     for subs in subs_list:
-        chat_id, dates, password = subs        
+        chat_id, dates, password = subs         
         date_list = dates.split(', ')
     
         for date_from_base in date_list:
