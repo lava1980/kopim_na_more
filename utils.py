@@ -141,14 +141,14 @@ def select_user_data(chat_id):
     cursor = conn.cursor()
     cursor.execute(
         f'SELECT purpose_sum, purpose_date, current_sum, charges, \
-payday_dates, secret_key, purp_currency, salary_currency, save_in_this_month \
-FROM users WHERE chat_id=?', 
+payday_dates, secret_key, purp_currency, salary_currency, save_in_this_month, \
+sum_to_save_in_this_month FROM users WHERE chat_id=?', 
         (chat_id,))
     date_list = cursor.fetchall()
     conn.commit()
     conn.close()        
     print(date_list[0])   
-    return date_list
+    return date_list[0]
 
 
 def select_subscribers():    
@@ -223,9 +223,8 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
     print(date_from_base)
     return date_from_base
 
-def day_to_purp(chat_id):
-    purp_date = get_data_cell('purpose_date', chat_id)
-    purp_date = datetime.datetime.strptime(purp_date, '%Y-%m-%d')
+def day_to_purp(chat_id, purpose_date):    
+    purp_date = datetime.datetime.strptime(purpose_date, '%Y-%m-%d')
     today = datetime.datetime.today()
     delta = purp_date - today    
     return delta.days
@@ -362,12 +361,96 @@ def parse_current_sum(summ, context):
 def split_every_month_saved_sum(summ, count_payed_days):
     pass
 
+def get_user_data_befor_conv(update, context):
+    purp_sum, purpose_date, current_sum, charges, payed_dates, \
+        secret_key, currency, salary_currency, save_in_this_month, \
+        sum_to_save_in_this_month = select_user_data(update.message.chat_id)
+    
+    context.user_data['purpose_date'] = purpose_date
+
+    left_days_to_purp = day_to_purp(update.message.chat_id, purpose_date)
+    context.user_data['left_days_to_purp'] = str(left_days_to_purp)
+
+    context.user_data['purpose_sum'] = str(purp_sum)
+    
+    context.user_data['current_sum'] = str(current_sum)
+    
+    context.user_data['payed_dates'] = payed_dates
+    payed_dates = payed_dates.split(', ')
+
+    context.user_data['save_in_this_month'] = str(save_in_this_month)
+
+    context.user_data['secret_key'] = secret_key
+
+    context.user_data['purp_currency'] = currency
+
+    context.user_data['salary_currency'] = salary_currency
+
+    context.user_data['currency'] = currency
+
+    every_month_purp_sum = get_split_sum_to_save(
+        payed_dates, 
+        sum_to_save_in_this_month, 
+        purp_sum, 
+        current_sum, 
+        left_days_to_purp, 
+        save_in_this_month, 
+        context, 
+        update)
+
+
+
+
+
+
+    context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
+
+    user_data_list = [purp_sum, purpose_date, current_sum, charges, payed_dates, \
+        secret_key, currency, salary_currency, save_in_this_month, \
+            every_month_purp_sum, sum_to_save_in_this_month]
+
+    return user_data_list
+
 
     
+def get_split_sum_to_save(
+                    payed_dates, 
+                    sum_to_save_in_this_month, 
+                    purp_sum, current_sum, 
+                    left_days_to_purp,
+                    save_in_this_month,
+                    context, 
+                    update):
+    today = str(datetime.datetime.now().day)    
     
+    for date in payed_dates:        
+        if today == date:            
+            index = payed_dates.index(date)
+            if index == 0: # Если первая дата в месяце, то задаётся цель на месяц
+                sum_to_save_in_this_month = (purp_sum - current_sum) / left_days_to_purp * 30
+                sum_to_save_in_this_month = int(round(sum_to_save_in_this_month/5.0)*5) 
+                context.user_data['sum_to_save_in_this_month'] = sum_to_save_in_this_month
+                write_entry_to_base(
+                    'sum_to_save_in_this_month', sum_to_save_in_this_month, update.message.chat_id)  
+            
+            every_month_purp_sum_split = ((purp_sum - current_sum) / left_days_to_purp * 30 - save_in_this_month)/ (len(payed_dates) - index)
+            # Убрать округление, или всё делать с округлением
+        
+            return every_month_purp_sum_split
+
+    # every_month_purp_sum = every_month_purp_sum_split - save_in_this_month
+    # every_month_purp_sum = int(round(every_month_purp_sum/5.0)*5) 
+
+# Мне надо понять, на каком месте находится сегодняшняя дата
 
 # 100
 # 25 35 40
+
+
+# elif payed_dates.index(today) == len(payed_dates):
+#     context.user_data['sum_to_save_in_this_month'] = '0'
+#     write_entry_to_base('sum_to_save_in_this_month', '0', update.message.chat_id)  
+
 
 
 

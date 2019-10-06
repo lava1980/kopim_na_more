@@ -127,44 +127,13 @@ def start_enter_pay_sum(update, context):
     query.message.reply_text('Введите общую сумму прихода за сегодня')
     return 'payed_summ'
 
-def get_payed_summ(update, context):
-    # TODO Сделать один запрос из базы, чтобы сразу 
-    # все нужные значения подтягивались
-    purpose_sum, purpose_date, current_sum, charges, payday_dates, \
-        secret_key, purp_currency, salary_currency, save_in_this_month = \
-            select_user_data(update.message.chat_id)
-
-    left_days_to_purp = day_to_purp(update.message.chat_id)
-    context.user_data['left_days_to_purp'] = str(left_days_to_purp)
-
-    purp_sum = get_data_cell('purpose_sum', update.message.chat_id)
-    context.user_data['purpose_sum'] = str(purp_sum)
-    
-    current_sum = get_data_cell('current_sum', update.message.chat_id)   # int 
-    context.user_data['current_sum'] = str(current_sum)
-
-    payed_dates = get_data_cell('payday_dates', update.message.chat_id)
-    context.user_data['payed_dates'] = payed_dates
-    payed_dates = payed_dates.split(', ')
-
-    save_in_this_month = get_data_cell('save_in_this_month', update.message.chat_id)   # int 
-    context.user_data['save_in_this_month'] = str(save_in_this_month)
-
-    every_month_purp_sum_all = (purp_sum - current_sum) / left_days_to_purp * 30
-    every_month_purp_sum_all = int(round(every_month_purp_sum_all/5.0)*5) 
-
-    every_month_purp_sum_split = (purp_sum - current_sum) / left_days_to_purp * 30 / len(payed_dates)
-    every_month_purp_sum = every_month_purp_sum_split - save_in_this_month
-    every_month_purp_sum = int(round(every_month_purp_sum/5.0)*5) 
-    context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
-
-
-    
+def get_payed_summ(update, context):   
+    purp_sum, purpose_date, current_sum, charges, payed_dates, \
+    secret_key, currency, salary_currency, save_in_this_month, \
+    every_month_purp_sum, sum_to_save_in_this_month \
+                = get_user_data_befor_conv(update, context)    
     
     payed_summ = update.message.text    
-    currency = get_data_cell('purp_currency', update.message.chat_id)
-    context.user_data['currency'] = currency    
-    charges = get_data_cell('charges', update.message.chat_id)
     cashflow = int(payed_summ) - charges
     if cashflow < 100:
         little_sum = get_little_sum(cashflow)
@@ -181,7 +150,7 @@ def get_payed_summ(update, context):
             how_much_saving_text = ''
         else: how_much_saving_text = f'Вы отложили {save_in_this_month} {currency}.' 
         update.message.reply_text(
-            f'В этом месяце по графику вам нужно сохранить {every_month_purp_sum_all} {currency}. \
+            f'В этом месяце по графику вам нужно сохранить {sum_to_save_in_this_month} {currency}. \
 {how_much_saving_text} Сейчас нужно отложить {str(every_month_purp_sum)} {currency} или больше. \
 Сколько откладываем?', 
             reply_markup=pay_day_inline_keyboard2(every_month_purp_sum, currency))
