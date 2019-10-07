@@ -382,34 +382,6 @@ def get_user_data_befor_conv(update, context):
     context.user_data['salary_currency'] = salary_currency
     context.user_data['currency'] = currency
 
-    every_month_purp_sum, sum_to_save_in_this_month, save_in_this_month = get_split_sum_to_save(
-                                                                payed_dates, 
-                                                                sum_to_save_in_this_month, 
-                                                                purp_sum, 
-                                                                current_sum, 
-                                                                left_days_to_purp, 
-                                                                save_in_this_month, 
-                                                                context, 
-                                                                update)
-
-    context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
-
-    user_data_list = [purp_sum, purpose_date, current_sum, charges, payed_dates, \
-        secret_key, currency, salary_currency, save_in_this_month, \
-            every_month_purp_sum, sum_to_save_in_this_month]
-
-    return user_data_list
-
-
-    
-def get_split_sum_to_save(
-                    payed_dates, 
-                    sum_to_save_in_this_month, 
-                    purp_sum, current_sum, 
-                    left_days_to_purp,
-                    save_in_this_month,
-                    context, 
-                    update):
     today = str(datetime.datetime.now().day)        
     
     for date in payed_dates:        
@@ -424,12 +396,19 @@ def get_split_sum_to_save(
                 save_in_this_month = 0
                 context.user_data['save_in_this_month'] = str(save_in_this_month)            
 
-            every_month_purp_sum_split = (sum_to_save_in_this_month - save_in_this_month)/ (len(payed_dates) - index)
-            every_month_purp_sum_split = int(round(every_month_purp_sum_split/5.0)*5) 
-            
-        
-            return every_month_purp_sum_split, sum_to_save_in_this_month, save_in_this_month
+            every_month_purp_sum = (sum_to_save_in_this_month - save_in_this_month)/ (len(payed_dates) - index)
+            every_month_purp_sum = int(round(every_month_purp_sum/5.0)*5) 
 
+    context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
+
+    user_data_list = [purp_sum, purpose_date, current_sum, charges, payed_dates, \
+        secret_key, currency, salary_currency, save_in_this_month, \
+            every_month_purp_sum, sum_to_save_in_this_month]
+
+    return user_data_list
+
+
+    
 
 
 
