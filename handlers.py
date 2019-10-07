@@ -174,7 +174,7 @@ def get_saving_sum(update, context):
 
 
     write_entry_to_base('current_sum', current_sum, query.message.chat_id) 
-    write_entry_to_base('save_in_this_month', every_month_purp_sum, query.message.chat_id)
+    write_entry_to_base('save_in_this_month', save_in_this_month, query.message.chat_id)
     context.user_data['current_sum'] = str(current_sum)
     query.message.reply_text('Отлично, информацию принял!')
 

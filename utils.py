@@ -371,37 +371,26 @@ def get_user_data_befor_conv(update, context):
     left_days_to_purp = day_to_purp(update.message.chat_id, purpose_date)
     context.user_data['left_days_to_purp'] = str(left_days_to_purp)
 
-    context.user_data['purpose_sum'] = str(purp_sum)
-    
-    context.user_data['current_sum'] = str(current_sum)
-    
+    context.user_data['purpose_sum'] = str(purp_sum)    
+    context.user_data['current_sum'] = str(current_sum)    
     context.user_data['payed_dates'] = payed_dates
     payed_dates = payed_dates.split(', ')
 
     context.user_data['save_in_this_month'] = str(save_in_this_month)
-
     context.user_data['secret_key'] = secret_key
-
     context.user_data['purp_currency'] = currency
-
     context.user_data['salary_currency'] = salary_currency
-
     context.user_data['currency'] = currency
 
-    every_month_purp_sum = get_split_sum_to_save(
-        payed_dates, 
-        sum_to_save_in_this_month, 
-        purp_sum, 
-        current_sum, 
-        left_days_to_purp, 
-        save_in_this_month, 
-        context, 
-        update)
-
-
-
-
-
+    every_month_purp_sum, sum_to_save_in_this_month, save_in_this_month = get_split_sum_to_save(
+                                                                payed_dates, 
+                                                                sum_to_save_in_this_month, 
+                                                                purp_sum, 
+                                                                current_sum, 
+                                                                left_days_to_purp, 
+                                                                save_in_this_month, 
+                                                                context, 
+                                                                update)
 
     context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
 
@@ -421,7 +410,7 @@ def get_split_sum_to_save(
                     save_in_this_month,
                     context, 
                     update):
-    today = str(datetime.datetime.now().day)    
+    today = str(datetime.datetime.now().day)        
     
     for date in payed_dates:        
         if today == date:            
@@ -432,27 +421,20 @@ def get_split_sum_to_save(
                 context.user_data['sum_to_save_in_this_month'] = sum_to_save_in_this_month
                 write_entry_to_base(
                     'sum_to_save_in_this_month', sum_to_save_in_this_month, update.message.chat_id)  
+                save_in_this_month = 0
+                context.user_data['save_in_this_month'] = str(save_in_this_month)            
+
+            every_month_purp_sum_split = (sum_to_save_in_this_month - save_in_this_month)/ (len(payed_dates) - index)
+            every_month_purp_sum_split = int(round(every_month_purp_sum_split/5.0)*5) 
             
-            every_month_purp_sum_split = ((purp_sum - current_sum) / left_days_to_purp * 30 - save_in_this_month)/ (len(payed_dates) - index)
-            # Убрать округление, или всё делать с округлением
         
-            return every_month_purp_sum_split
-
-    # every_month_purp_sum = every_month_purp_sum_split - save_in_this_month
-    # every_month_purp_sum = int(round(every_month_purp_sum/5.0)*5) 
-
-# Мне надо понять, на каком месте находится сегодняшняя дата
-
-# 100
-# 25 35 40
-
-
-# elif payed_dates.index(today) == len(payed_dates):
-#     context.user_data['sum_to_save_in_this_month'] = '0'
-#     write_entry_to_base('sum_to_save_in_this_month', '0', update.message.chat_id)  
+            return every_month_purp_sum_split, sum_to_save_in_this_month, save_in_this_month
 
 
 
+
+# TODO Сделать поздравления, когда месячная цель достигнута. Т.е. 
+# sum_to_save_in_this_month == save_in_this_month.
 
 # TODO Поделить предложение отложить сумму на число приходов. Чтобы если в этот 
 # месяц ему надо отложить 80 долларов, то ему предлагались варианты: 20, 25, 35
@@ -467,24 +449,6 @@ def get_split_sum_to_save(
 # TODO Сделаю автоматический забор суммы для нас, а для остальных 
 # предусмотрю возможность ввести приход в день прихода. 
 
-
-# Вот у него день прихода. Он получил 1000 рублей. Что мне делать? 
-
-# Я знаю, что у него будет ещё два прихода. И что? Надо проверить, сколько ему надо по 
-# графику. 
-
-# И минусовать эту сумму, что он отложит.
-
-# Но это же для одного дня прихода. Я не знаю, какие приходы будут у него потом. 
-# Все эти расчёты только для одного текущего дня прихода. В этом сложность. 
-
-
-
-# А можно поступить ещё проще. У меня есть сумма которую надо накопить. У меня есть
-# число приходов. Я просто предлагаю ему отложить сумму, поделенную на число приходов. 
-
-# Например, ему надо отложить 80 долларов в том месяце. Всего 3 прихода. Тогда в первый приход я 
-# предлагаю отложить 80/3 = 25 рублей
 
 
 
