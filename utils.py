@@ -44,23 +44,15 @@ def pay_day_inline_keyboard2(every_month_purp_sum, currency):
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
-def pay_day_inline_keyboard3(litle_summa, every_month_purp_sum, currency):
-    inlinekeyboard = [
-        [InlineKeyboardButton(litle_summa + ' ' + currency, callback_data='1'),        
-        InlineKeyboardButton(every_month_purp_sum + ' ' + currency, callback_data='2')],
-        [InlineKeyboardButton('Пропустить', callback_data='pass_current_month_2')]
-                        
-                        ]
-    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
-    return kbd_markup
-
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS users
-                    (family_id text PRIMARY KEY, chat_id text, first_name text, purpose text, 
-                    purpose_date text, current_sum integer, payday_dates text, 
-                    every_month_purp_sum text, secret_key text)''' # secret_key для приглашения членов семьи
+                    (chat_id text PRIMARY KEY, first_name text, purpose text, 
+                    purpose_sum integer, purpose_date text, current_sum integer, 
+                    charges integer, payday_dates text, secret_key text, 
+                    purp_currency text, salary_currency text, save_in_this_month integer, 
+                    sum_to_save_in_this_month integer)''' # secret_key для приглашения членов семьи
                     )
     conn.commit()
     conn.close()
@@ -239,15 +231,15 @@ def get_resume_text(update, context):
     progres = int(round(current_sum / purp_sum * 100))
     currency = context.user_data['currency']
 
-    text = f'''<b>Ситуация на текущий момент:</b> 
+    text = f'''{config.EMOJI['megaphone']} <b>Ситуация на текущий момент:</b> 
 
-До отдыха осталось: {str(left_days_to_purp)} дней
-На сегодня собрали: {str(current_sum)} {currency}
-Осталось собрать: {str(left_to_collect)} {currency}
+{config.EMOJI['calendar']} До отдыха осталось: {str(left_days_to_purp)} дней
+{config.EMOJI['money_bag']} На сегодня собрали: {str(current_sum)} {currency}
+{config.EMOJI['hand_right']} Осталось собрать: {str(left_to_collect)} {currency}
 
-Цель выполнена на {str(progres)}%
+{config.EMOJI['bar_chart']} Цель выполнена на {str(progres)}%
 
-Цель: ежемесячно откладывать не менее {str(save_per_month)} {currency}
+{config.EMOJI['target']} Цель: ежемесячно откладывать не менее {str(save_per_month)} {currency}
 '''     
     return text
 
@@ -262,14 +254,6 @@ def resume(update, context):
         context.bot.send_chat_action(update.callback_query.message.chat_id, ChatAction.TYPING)
         time.sleep(2)
         update.callback_query.message.reply_text(text, parse_mode=ParseMode.HTML)
-
-def get_little_sum(cashflow):
-    litle_sum = cashflow / 100 * 5    
-    if litle_sum < 5:
-        litle_sum = 5
-    else: litle_sum = int(round(litle_sum/5.0)*5)    # округляем до 5
-    return litle_sum
-
 
 '''ПАРСИМ ДАННЫЕ, КОТОРЫЕ ВВЁЛ ЧЕЛОВЕК'''
 
@@ -358,8 +342,6 @@ def parse_current_sum(summ, context):
             else: return -1
     else: return -1
         
-def split_every_month_saved_sum(summ, count_payed_days):
-    pass
 
 def get_user_data_befor_conv(update, context):
     purp_sum, purpose_date, current_sum, charges, payed_dates, \
@@ -412,13 +394,10 @@ def get_user_data_befor_conv(update, context):
 
 
 
+# TODO Сделать пересчёт зарплаты в валюту накопления... предлагать в валюте накопления
+
 # TODO Сделать поздравления, когда месячная цель достигнута. Т.е. 
 # sum_to_save_in_this_month == save_in_this_month.
-
-# TODO Поделить предложение отложить сумму на число приходов. Чтобы если в этот 
-# месяц ему надо отложить 80 долларов, то ему предлагались варианты: 20, 25, 35
-
-# TODO Сделать пересчёт зарплаты в валюту накопления... предлагать в валюте накопления
 
 # TODO Сделать, чтобы люди могли редактировать свои данные (и обновлялась база)
 
@@ -427,6 +406,10 @@ def get_user_data_befor_conv(update, context):
 
 # TODO Сделаю автоматический забор суммы для нас, а для остальных 
 # предусмотрю возможность ввести приход в день прихода. 
+
+# TODO Добавить возможность ввести неплановую сумму. 
+
+
 
 
 
@@ -437,7 +420,6 @@ if __name__ == '__main__':
     # payday_date_handler('30')
     # get_subscribers_send_to('3')
     # select_family_list('$DDMsf!cIzpyehr')
-    # get_little_sum(259)
     # day_to_purp('529133148')
     # parse_purpose_sum('50 ДОЛЛАРОВ')
     # print(check_user_sum_entry('50 000 jkjkjk'))

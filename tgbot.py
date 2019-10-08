@@ -30,12 +30,12 @@ def send_updates(context):
         date_list = dates.split(', ')
     
         for date_from_base in date_list:
-            # date_from_base = payday_date_handler(date_from_base) # Проверяем или з/п не приходится на выходной
+            date_from_base = payday_date_handler(date_from_base) # Проверяем или з/п не приходится на выходной
             if today_date == int(date_from_base):
                 # Основной код, который должен выполняться в день выдачи зарплаты                
                 context.bot.send_message(
                     chat_id=config.ADMIN_ID, 
-                    text='Привет! Сегодня классный день -- день зарплаты! Вы получили деньги?',
+                    text=f'Привет {config.EMOJI["waving_hand"]} Сегодня классный день — день зарплаты) Вы получили деньги?',
                     reply_markup=pay_day_inline_keyboard1()
                     )
     
@@ -95,18 +95,11 @@ def main():
     )
 
     enter_pay_sum = ConversationHandler(
-        entry_points = [CallbackQueryHandler(start_enter_pay_sum, pattern='yes')],
-        states = {
-            'payed_summ': [MessageHandler(Filters.text, get_payed_summ)],
+        entry_points = [CallbackQueryHandler(start_get_payed_summ, pattern='yes')],
+        states = {            
             'how_much_saving': [CallbackQueryHandler(get_other_sum, pattern='other'),
                                 CallbackQueryHandler(pass_current_month, pattern='pass_current_month'),
-
-                                CallbackQueryHandler(get_saving_sum, pattern='1'),
-                                CallbackQueryHandler(get_saving_sum, pattern='2'),
                                 CallbackQueryHandler(pass_current_month, pattern='pass_current_month_2'),
-
-
-
                                 CallbackQueryHandler(get_saving_sum)],
             'enter_sum': [MessageHandler(Filters.text, get_other_saving_sum)] 
         }, 
@@ -120,7 +113,22 @@ def main():
     dp.add_handler(CallbackQueryHandler(set_delay, pattern='no'))   
     dp.add_handler(CommandHandler('start', greet_user))      
     
-    mybot.start_polling()  
+    # webhook_domain = 'https://python-developer.ru'
+    webhook_domain = 'https://lmxgcm5k2b.execute-api.us-east-2.amazonaws.com/v1'
+    PORT = 5079
+    
+    # Использовать незарезервированный порт, например, 5000. 
+    # Если порт зарезервирован, то будет 502 bad gateway
+    # Порт сервера и порт в ngrok должны совпадать. В механике разберусь потом. 
+
+
+    mybot.start_webhook(listen='127.0.0.1',
+                    port=PORT,
+                    url_path=config.TOKEN,
+                    webhook_url=f'{webhook_domain}/{config.TOKEN}')
+
+
+    # mybot.start_polling()  
     mybot.idle()
 
 
