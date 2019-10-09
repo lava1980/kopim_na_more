@@ -1,4 +1,5 @@
 import datetime
+import locale
 import logging
 import random
 import sqlite3
@@ -231,20 +232,28 @@ def get_resume_text(update, context):
     current_sum = int(context.user_data['current_sum'])
     purp_sum = int(context.user_data['purpose_sum'])
     left_to_collect = purp_sum - current_sum
-    save_per_month = left_to_collect / left_days_to_purp * 30
+    # save_per_month = left_to_collect / left_days_to_purp * 30
+    save_per_month = left_to_collect / round(left_days_to_purp / 30)
     save_per_month = int(round(save_per_month/5.0)*5)   
     progres = int(round(current_sum / purp_sum * 100))
     currency = context.user_data['currency']
+    
+    locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
+    date_str = datetime.datetime.strptime(context.user_data['purpose_date'], '%Y-%m-%d')
+    date_str = date_str.strftime('%d %B %Y')
 
     text = f'''{config.EMOJI['megaphone']} <b>Ситуация на текущий момент:</b> 
 
-{config.EMOJI['calendar']} До отдыха осталось: {str(left_days_to_purp)} дней
+{config.EMOJI['target']} Цель: {context.user_data['purpose']}
+{config.EMOJI['calendar']} Дата цели: {date_str}
+----------
+{config.EMOJI['foot']} Осталось: {str(left_days_to_purp)} дней
 {config.EMOJI['money_bag']} На сегодня собрали: {str(current_sum)} {currency}
 {config.EMOJI['hand_right']} Осталось собрать: {str(left_to_collect)} {currency}
 
 {config.EMOJI['bar_chart']} Цель выполнена на {str(progres)}%
 
-{config.EMOJI['target']} Цель: ежемесячно откладывать не менее {str(save_per_month)} {currency}
+{config.EMOJI['double_exclamation_mark']} План: ежемесячно откладывать <b>не менее {str(save_per_month)} {currency}</b>
 '''     
     return text
 
@@ -403,8 +412,7 @@ def get_user_data_befor_conv(update, context):
     
 
 
-
-# TODO Сделать пересчёт зарплаты в валюту накопления... предлагать в валюте накопления
+# TODO Добавить возможность ввести неплановую сумму. 
 
 # TODO Сделать поздравления, когда месячная цель достигнута. Т.е. 
 # sum_to_save_in_this_month == save_in_this_month.
@@ -417,7 +425,7 @@ def get_user_data_befor_conv(update, context):
 # TODO Сделаю автоматический забор суммы для нас, а для остальных 
 # предусмотрю возможность ввести приход в день прихода. 
 
-# TODO Добавить возможность ввести неплановую сумму. 
+
 
 
 

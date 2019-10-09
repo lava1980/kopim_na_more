@@ -70,9 +70,9 @@ def main():
             CallbackQueryHandler(initial_data_start, pattern='new_user'), 
             CallbackQueryHandler(invited_user_conv, pattern='invited_user')
             ],
-        states = {                 
-                'purpose': [MessageHandler(Filters.text, get_purpose)],
+        states = {             
                 'purpose_type': [CallbackQueryHandler(get_purpose_type)],
+                'purpose': [MessageHandler(Filters.text, get_purpose)],
                 'purpose_sum': [MessageHandler(Filters.text, get_purpose_sum)],
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
                 'current_sum': [MessageHandler(Filters.text, get_current_sum)],
