@@ -43,6 +43,12 @@ def purp_type_inline_keyboard():
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
+def handle_var_inside_text(dictionary, key):
+    text_list = dictionary[key]
+    text = random.choice(text_list)
+    return text
+  
+
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()

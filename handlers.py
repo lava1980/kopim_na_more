@@ -34,7 +34,11 @@ def initial_data_start(update, context):
     query = update.callback_query
     data = get_initial_data(update)
     write_initial_data_to_base(data)
-    query.message.reply_text(f'{config.EMOJI["target"]} На что копим? Пример: Отдых в Сочи')
+    
+    purpose_type = get_data_cell('purpose_type', query.message.chat_id)
+    context.user_data['purpose_type'] = purpose_type
+    query.message.reply_text(
+        f'{config.EMOJI["target"]} На что копим? {handle_var_inside_text(, config.PURPOSE_EXAMPLE_TEXT, purpose_type)}')
     return 'purpose'
 
 def get_purpose(update, context):
@@ -94,7 +98,7 @@ def get_payday_dates(update, context):
         return 'payday_dates'
     write_entry_to_base('payday_dates', dates, update.message.chat_id) 
     update.message.reply_text('Спасибо, ответы принял.')
-    
+
     context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)    
     password = password_generation()
     write_entry_to_base('secret_key', password, update.message.chat_id)
@@ -239,6 +243,7 @@ def ask_question(context):
 
 # TODO В резюме вставлять дату цели
 # TODO В резюме вставить название цели
+# TODO Поменять местами тип цели и цель. Тип цели сделать первым
 # TODO Сделать в начальных настройках, чтобы он определял тип цели: отдых, покупка и пр.
 # TODO В начале объяснить, что для того, чтобы бот нормально работал, его нужно 
 # настроить. И спрашивать: вы готовы настроить сейчас?
