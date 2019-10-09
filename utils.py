@@ -245,6 +245,8 @@ def get_resume_text(update, context):
 
 def resume(update, context):    
     if update.callback_query == None:
+        if context.user_data.get('left_days_to_purp') == None:
+            get_user_data_befor_conv(update, context)
         text = get_resume_text(update, context)
         context.bot.send_chat_action(update.message.chat_id, ChatAction.TYPING)
         time.sleep(2)
@@ -380,8 +382,10 @@ def get_user_data_befor_conv(update, context):
 
             every_month_purp_sum = (sum_to_save_in_this_month - save_in_this_month)/ (len(payed_dates) - index)
             every_month_purp_sum = int(round(every_month_purp_sum/5.0)*5) 
-
-    context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
+            context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
+        else:
+            every_month_purp_sum = '0'
+            context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)    
 
     user_data_list = [purp_sum, purpose_date, current_sum, charges, payed_dates, \
         secret_key, currency, salary_currency, save_in_this_month, \
