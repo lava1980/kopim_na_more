@@ -19,16 +19,6 @@ def get_inline_keyboard():
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
-def inline_keyboard_currency():
-    inlinekeyboard = [[InlineKeyboardButton('RUB', callback_data='RUB'),
-                        InlineKeyboardButton('UAH', callback_data='UAH'), 
-                        InlineKeyboardButton('BYN', callback_data='BYN'), 
-                        InlineKeyboardButton('USD', callback_data='USD')]]
-    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
-    return kbd_markup
-
-
-
 
 def pay_day_inline_keyboard1():
     inlinekeyboard = [[InlineKeyboardButton('Да', callback_data='yes'),
@@ -44,11 +34,20 @@ def pay_day_inline_keyboard2(every_month_purp_sum, currency):
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
+def purp_type_inline_keyboard():
+    inlinekeyboard = [[InlineKeyboardButton('Отдых', callback_data='vacation'),
+                        InlineKeyboardButton('Покупка', callback_data='purchase'), 
+                        InlineKeyboardButton('Долг', callback_data='debt')], 
+                        [InlineKeyboardButton('Другой тип', callback_data='other-type')]                        
+                        ]
+    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
+    return kbd_markup
+
 def create_user_base():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS users
-                    (chat_id text PRIMARY KEY, first_name text, purpose text, 
+                    (chat_id text PRIMARY KEY, first_name text, purpose text, purpose_type text,
                     purpose_sum integer, purpose_date text, current_sum integer, 
                     charges integer, payday_dates text, secret_key text, 
                     purp_currency text, salary_currency text, save_in_this_month integer, 
@@ -132,7 +131,7 @@ def select_user_data(chat_id):
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
     cursor.execute(
-        f'SELECT purpose_sum, purpose_date, current_sum, charges, \
+        f'SELECT purpose, purpose_type, purpose_sum, purpose_date, current_sum, charges, \
 payday_dates, secret_key, purp_currency, salary_currency, save_in_this_month, \
 sum_to_save_in_this_month FROM users WHERE chat_id=?', 
         (chat_id,))
@@ -346,10 +345,11 @@ def parse_current_sum(summ, context):
         
 
 def get_user_data_befor_conv(update, context):
-    purp_sum, purpose_date, current_sum, charges, payed_dates, \
+    purpose, purpose_type, purp_sum, purpose_date, current_sum, charges, payed_dates, \
         secret_key, currency, salary_currency, save_in_this_month, \
         sum_to_save_in_this_month = select_user_data(update.message.chat_id)
-    
+    context.user_data['purpose'] = purpose
+    context.user_data['purpose_type'] = purpose_type
     context.user_data['purpose_date'] = purpose_date
 
     left_days_to_purp = day_to_purp(update.message.chat_id, purpose_date)

@@ -39,8 +39,14 @@ def initial_data_start(update, context):
 
 def get_purpose(update, context):
     write_entry_to_base('purpose', update.message.text, update.message.chat_id)
-    update.message.reply_text(
-        f'Какую сумму хотите собрать? Например, 1000 долларов... или 2000 белорусских рублей {config.EMOJI["winking_face"]}')    
+    update.message.reply_text('Укажите тип цели', reply_markup=purp_type_inline_keyboard())    
+    return 'purpose_type'
+
+def get_purpose_type(update, context):
+    query = update.callback_query
+    write_entry_to_base('purpose_type', query.data, query.message.chat_id)
+    query.message.reply_text(
+        f'Какую сумму хотите собрать? Например, 1000 долларов... или 2000 белорусских рублей {config.EMOJI["winking_face"]}')            
     return 'purpose_sum'
 
 def get_purpose_sum(update, context):          
@@ -86,19 +92,14 @@ def get_payday_dates(update, context):
     dates = user_entry_date_handler(update.message.text, update)
     if dates == 'payday_dates':
         return 'payday_dates'
-    write_entry_to_base('payday_dates', dates, update.message.chat_id)
-    update.message.reply_text('В какой валюте получаете зарплату?', reply_markup=inline_keyboard_currency())
-    return 'salary_currency'
-
-def get_salary_currency(update, context):  
-    query = update.callback_query
-    write_entry_to_base('salary_currency', query.data, query.message.chat_id)  
-    query.message.reply_text('Спасибо, ответы принял.')
-    context.bot.send_chat_action(chat_id=query.message.chat_id, action=ChatAction.TYPING)    
+    write_entry_to_base('payday_dates', dates, update.message.chat_id) 
+    update.message.reply_text('Спасибо, ответы принял.')
+    
+    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)    
     password = password_generation()
-    write_entry_to_base('secret_key', password, query.message.chat_id)
-    query.message.reply_text('Пароль вашей семьи: ' + password)
-    query.message.reply_text('Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю историю.')
+    write_entry_to_base('secret_key', password, update.message.chat_id)
+    update.message.reply_text('Пароль вашей семьи: ' + password)
+    update.message.reply_text('Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю историю.')
     return ConversationHandler.END   
 
 def dontknow(update, context):

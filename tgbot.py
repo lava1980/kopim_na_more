@@ -70,13 +70,13 @@ def main():
             CallbackQueryHandler(initial_data_start, pattern='new_user'), 
             CallbackQueryHandler(invited_user_conv, pattern='invited_user')
             ],
-        states = {                
+        states = {                 
                 'purpose': [MessageHandler(Filters.text, get_purpose)],
+                'purpose_type': [CallbackQueryHandler(get_purpose_type)],
                 'purpose_sum': [MessageHandler(Filters.text, get_purpose_sum)],
                 'purpose_date': [MessageHandler(Filters.text, get_purpose_date)], 
                 'current_sum': [MessageHandler(Filters.text, get_current_sum)],
-                'payday_dates': [MessageHandler(Filters.text, get_payday_dates)],
-                'salary_currency': [CallbackQueryHandler(get_salary_currency)]                                               
+                'payday_dates': [MessageHandler(Filters.text, get_payday_dates)]                                                            
                     
         },
         fallbacks = [MessageHandler(Filters.text, dontknow)]
