@@ -183,10 +183,15 @@ def get_saving_sum(update, context):
     
 #########################################################
 
-def get_other_sum(update, context):
-    query = update.callback_query        
-    query.message.reply_text(
-        f'Введите сумму, которую отложите {EMOJI["hand_pointing_down"]}')    
+def get_other_sum(update, context):    
+    query = update.callback_query  
+    if query != None:      # Через инлайн клавиатуру, user_data подгружены
+        query.message.reply_text(
+            f'Введите сумму, которую отложите {EMOJI["hand_pointing_down"]}')    
+    else:
+        get_user_data_befor_conv(update, context) # Вызов через команду, подгружаем user_data
+        update.message.reply_text(
+            f'Введите сумму, которую отложите {EMOJI["hand_pointing_down"]}')
     return 'enter_sum'
 
 def get_other_saving_sum(update, context):   
@@ -248,10 +253,16 @@ def ask_question(context):
 
 
 
-# TODO В резюме вставлять дату цели
-# TODO В резюме вставить название цели
-# TODO Поменять местами тип цели и цель. Тип цели сделать первым
-# TODO Сделать в начальных настройках, чтобы он определял тип цели: отдых, покупка и пр.
+# TODO Сделать, чтобы уведомления приходили не админам.
+
+# TODO Сделать поздравления, когда месячная цель достигнута. Т.е. 
+# sum_to_save_in_this_month == save_in_this_month.
+
+# TODO Сделать, чтобы люди могли редактировать свои данные (и обновлялась база)
+
+# TODO Сделать, чтобы когда зарплата приходится на выходной, чтобы челу потом и в выходной не 
+# приходило уведомление
+
 # TODO В начале объяснить, что для того, чтобы бот нормально работал, его нужно 
 # настроить. И спрашивать: вы готовы настроить сейчас?
 

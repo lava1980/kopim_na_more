@@ -95,7 +95,9 @@ def main():
     )
 
     enter_pay_sum = ConversationHandler(
-        entry_points = [CallbackQueryHandler(start_get_payed_summ, pattern='yes')],
+        entry_points = [CallbackQueryHandler(start_get_payed_summ, pattern='yes'), 
+                        CommandHandler('add', get_other_sum)
+        ],
         states = {            
             'how_much_saving': [CallbackQueryHandler(get_other_sum, pattern='other'),
                                 CallbackQueryHandler(pass_current_month, pattern='pass_current_month'),
