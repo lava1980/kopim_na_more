@@ -93,16 +93,26 @@ def list_from_base_column(column): # Возвращает список знач�
     conn.close()    
     return column_list # [('-yGIB7rf?NKU0Dk',), (None,)]
 
-def update_invited_user_data(chatid):
+def update_invited_user_data(chatid, user_data_list):
+
+
+    purpose, purpose_type, purpose_sum, purpose_date, \
+        current_sum, payday_dates, secret_key, purp_currency, save_in_this_month, \
+        sum_to_save_in_this_month = user_data_list
+    
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
     cursor.execute(
-        '''UPDATE users SET purpose=Null, purpose_date=Null, 
-        current_sum=Null, payday_dates=Null, every_month_purp_sum=Null WHERE chat_id=?''', 
-        (chatid,)
+        '''UPDATE users SET purpose=?, purpose_type=?, purpose_sum=?, purpose_date=?, 
+        current_sum=?, payday_dates=?, secret_key=?, purp_currency=?, save_in_this_month=?, 
+        sum_to_save_in_this_month=? WHERE chat_id=?''', 
+        (purpose, purpose_type, purpose_sum, purpose_date,
+        current_sum, payday_dates, secret_key, purp_currency, save_in_this_month,
+        sum_to_save_in_this_month, chatid)
         )
     conn.commit()
     conn.close()
+
 
 def get_date_string(column, chat_id):
     conn = sqlite3.connect('user_base.db')
@@ -127,19 +137,18 @@ def get_data_cell(column, chat_id):
 def select_family_list(password):
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
-    cursor.execute(f'SELECT chat_id, secret_key FROM users WHERE secret_key=?', (password,))
+    cursor.execute(f'SELECT chat_id, secret_key, role FROM users WHERE secret_key=?', (password,))
     date_list = cursor.fetchall()
     conn.commit()
-    conn.close()        
-    print(date_list)   
+    conn.close()            
     return date_list
 
 def select_user_data(chat_id):
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
     cursor.execute(
-        f'SELECT purpose, purpose_type, purpose_sum, purpose_date, current_sum, charges, \
-payday_dates, secret_key, purp_currency, salary_currency, save_in_this_month, \
+        f'SELECT purpose, purpose_type, purpose_sum, purpose_date, current_sum, \
+payday_dates, secret_key, purp_currency, save_in_this_month, \
 sum_to_save_in_this_month FROM users WHERE chat_id=?', 
         (chat_id,))
     date_list = cursor.fetchall()
@@ -171,7 +180,8 @@ def get_subscribers_send_to(date_str): # '11'
     return subs_list_send_to # [('891850606', '2, 1, 13', '-yGIB7rf?NKU0Dk')]
 
 def password_generation():
-    chars = '+-/*!&$#?=@<>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
+    # chars = '+-/*!&$#?=@<>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
+    chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'    
     length = 15    
     password = ''
     for i in range(length):
@@ -227,7 +237,7 @@ def day_to_purp(chat_id, purpose_date):
     delta = purp_date - today    
     return delta.days
 
-def get_resume_text(update, context):
+def get_resume_text(context):
     left_days_to_purp = int(context.user_data['left_days_to_purp'])
     current_sum = int(context.user_data['current_sum'])
     purp_sum = int(context.user_data['purpose_sum'])
@@ -236,7 +246,7 @@ def get_resume_text(update, context):
     save_per_month = left_to_collect / round(left_days_to_purp / 30)
     save_per_month = int(round(save_per_month/5.0)*5)   
     progres = int(round(current_sum / purp_sum * 100))
-    currency = context.user_data['currency']
+    currency = context.user_data['purp_currency']
     
     locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
     date_str = datetime.datetime.strptime(context.user_data['purpose_date'], '%Y-%m-%d')
@@ -257,19 +267,68 @@ def get_resume_text(update, context):
 '''     
     return text
 
-def resume(update, context):    
-    if update.callback_query == None:
-        if context.user_data.get('left_days_to_purp') == None:
-            get_user_data_befor_conv(update, context)
-        text = get_resume_text(update, context)
-        context.bot.send_chat_action(update.message.chat_id, ChatAction.TYPING)
-        time.sleep(2)
-        update.message.reply_text(text, parse_mode=ParseMode.HTML)
-    else: 
-        text = get_resume_text(update.callback_query, context)
-        context.bot.send_chat_action(update.callback_query.message.chat_id, ChatAction.TYPING)
-        time.sleep(2)
-        update.callback_query.message.reply_text(text, parse_mode=ParseMode.HTML)
+# Что мне надо сделать? Мне надо:
+
+
+
+# 1. Вытянуть из базы всех юзеров, у которых такой же пароль (chat_id).
+# 2. Разослать им сообщение резюме
+
+# Он нажал на кнопку получения инфы. И что? 
+
+# Надо тчобы при нажатии на кнопку:
+# 1. Определить кто это -- админ или член семьи, чтобы понимать, кому слать. А какая
+# разница? Мне надо иметь чат-айди. Чтобы я мог слать сообщения. Мне надо просто понимать, 
+# кому слать. 
+
+# Если это человек, то у него уже есть чат-айди, мне надо просто ... и у него уже есть запись в базе.
+# Мне просто надо её прочитать. Вот и всё, и не надо изобретать велосипед. 
+
+
+
+def send_resume_to_family(update, context):
+    if update.callback_query != None:
+        update = update.callback_query
+    password = context.user_data['secret_key']
+    family_list = select_family_list(password)
+    for family in family_list:
+        chat_id, passw = family
+        # assert chat_id == update.message.chat_id, 'chat_id не равен update.message.chat_id'
+        if chat_id == str(update.message.chat_id):
+            continue
+        else:
+            resume(chat_id, context)
+
+    
+        
+def get_family_admin_id(password):
+    family_list = select_family_list(password)  
+    for family in family_list:
+        chat_id, passw, role = family
+        if role == 'admin':
+            return chat_id   
+
+
+
+def send_resume(update, context):
+    if update.callback_query != None:
+        update = update.callback_query
+    if context.user_data.get('left_days_to_purp') == None:
+        get_user_data_befor_conv(update, context)
+    resume(update.message.chat_id, context)
+    send_resume_to_family(update, context)
+
+
+
+def resume(chat_id, context):
+    text = get_resume_text(context)
+    context.bot.send_chat_action(chat_id, ChatAction.TYPING)
+    time.sleep(2)    
+    context.bot.send_message(
+        chat_id=chat_id, text=text, parse_mode=ParseMode.HTML)
+
+
+
 
 '''ПАРСИМ ДАННЫЕ, КОТОРЫЕ ВВЁЛ ЧЕЛОВЕК'''
 
@@ -360,8 +419,8 @@ def parse_current_sum(summ, context):
         
 
 def get_user_data_befor_conv(update, context):
-    purpose, purpose_type, purp_sum, purpose_date, current_sum, charges, payed_dates, \
-        secret_key, currency, salary_currency, save_in_this_month, \
+    purpose, purpose_type, purp_sum, purpose_date, current_sum, payed_dates, \
+        secret_key, currency, save_in_this_month, \
         sum_to_save_in_this_month = select_user_data(update.message.chat_id)
     context.user_data['purpose'] = purpose
     context.user_data['purpose_type'] = purpose_type
@@ -373,13 +432,11 @@ def get_user_data_befor_conv(update, context):
     context.user_data['purpose_sum'] = str(purp_sum)    
     context.user_data['current_sum'] = str(current_sum)    
     context.user_data['payed_dates'] = payed_dates
-    payed_dates = payed_dates.split(', ')
+    # payed_dates = payed_dates.split(', ')
 
     context.user_data['save_in_this_month'] = str(save_in_this_month)
     context.user_data['secret_key'] = secret_key
-    context.user_data['purp_currency'] = currency
-    context.user_data['salary_currency'] = salary_currency
-    context.user_data['currency'] = currency
+    context.user_data['purp_currency'] = currency        
 
     today = str(datetime.datetime.now().day)        
     
@@ -402,9 +459,9 @@ def get_user_data_befor_conv(update, context):
             every_month_purp_sum = '0'
             context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)    
 
-    user_data_list = [purp_sum, purpose_date, current_sum, charges, payed_dates, \
-        secret_key, currency, salary_currency, save_in_this_month, \
-            every_month_purp_sum, sum_to_save_in_this_month]
+    user_data_list = [purpose, purpose_type, purp_sum, purpose_date, current_sum, payed_dates, \
+        secret_key, currency, save_in_this_month, \
+            sum_to_save_in_this_month]
 
     return user_data_list
 

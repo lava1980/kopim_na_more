@@ -114,7 +114,7 @@ def main():
     dp.add_handler(initial_data) 
     dp.add_handler(CallbackQueryHandler(set_delay, pattern='no'))   
     dp.add_handler(CommandHandler('start', greet_user))      
-    dp.add_handler(CommandHandler('now', resume))      
+    dp.add_handler(CommandHandler('now', send_resume))      
     
     # webhook_domain = 'https://python-developer.ru'
     # webhook_domain = 'https://0s0bgia3m3.execute-api.us-east-2.amazonaws.com/v1'

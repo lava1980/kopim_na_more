@@ -126,9 +126,11 @@ def invited_user_conv(update, context):
 def get_password(update, context):
     pass_list = list_from_base_column('secret_key') # [('-yGIB7rf?NKU0Dk',), (None,)]
     for item in pass_list:
-        if item[0] == update.message.text:            
-            write_entry_to_base('secret_key', update.message.text, update.message.chat_id)
-            update_invited_user_data(update.message.chat_id) # Удаляем данные, если они были
+        if item[0] == update.message.text:   
+            admin_id = get_family_admin_id(update.message.text)                     
+            user_data_list = select_user_data(admin_id)
+            
+            update_invited_user_data(update.message.chat_id, user_data_list)
             update.message.reply_text('Отлично! Теперь вам будут приходить уведомления')
             break
         else: 
@@ -143,9 +145,9 @@ def start_get_payed_summ(update, context):
     unset(update, context)
     update = update.callback_query
 
-    purp_sum, purpose_date, current_sum, charges, payed_dates, \
-    secret_key, currency, salary_currency, save_in_this_month, \
-    every_month_purp_sum, sum_to_save_in_this_month \
+    purpose, purpose_type, purp_sum, purpose_date, current_sum, payed_dates, \
+    secret_key, currency, save_in_this_month, \
+    sum_to_save_in_this_month \
                 = get_user_data_befor_conv(update, context)    
     
     payed_summ = update.message.text    
@@ -207,7 +209,7 @@ def get_other_saving_sum(update, context):
     context.user_data['current_sum'] = str(current_sum)
     update.message.reply_text(f'Отлично, информацию принял {EMOJI["ok_hand"]}')    
     
-    resume(update, context)
+    send_resume(update, context)
     return ConversationHandler.END
     
 ###########################################################
