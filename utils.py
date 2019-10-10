@@ -98,7 +98,7 @@ def update_invited_user_data(chatid, user_data_list):
 
     purpose, purpose_type, purpose_sum, purpose_date, \
         current_sum, payday_dates, secret_key, purp_currency, save_in_this_month, \
-        sum_to_save_in_this_month = user_data_list
+        sum_to_save_in_this_month, role = user_data_list
     
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
@@ -149,7 +149,7 @@ def select_user_data(chat_id):
     cursor.execute(
         f'SELECT purpose, purpose_type, purpose_sum, purpose_date, current_sum, \
 payday_dates, secret_key, purp_currency, save_in_this_month, \
-sum_to_save_in_this_month FROM users WHERE chat_id=?', 
+sum_to_save_in_this_month, role FROM users WHERE chat_id=?', 
         (chat_id,))
     date_list = cursor.fetchall()
     conn.commit()
@@ -292,7 +292,7 @@ def send_resume_to_family(update, context):
     password = context.user_data['secret_key']
     family_list = select_family_list(password)
     for family in family_list:
-        chat_id, passw = family
+        chat_id, passw, role = family
         # assert chat_id == update.message.chat_id, 'chat_id не равен update.message.chat_id'
         if chat_id == str(update.message.chat_id):
             continue
@@ -301,13 +301,6 @@ def send_resume_to_family(update, context):
 
     
         
-def get_family_admin_id(password):
-    family_list = select_family_list(password)  
-    for family in family_list:
-        chat_id, passw, role = family
-        if role == 'admin':
-            return chat_id   
-
 
 
 def send_resume(update, context):
@@ -421,7 +414,7 @@ def parse_current_sum(summ, context):
 def get_user_data_befor_conv(update, context):
     purpose, purpose_type, purp_sum, purpose_date, current_sum, payed_dates, \
         secret_key, currency, save_in_this_month, \
-        sum_to_save_in_this_month = select_user_data(update.message.chat_id)
+        sum_to_save_in_this_month, role = select_user_data(update.message.chat_id)
     context.user_data['purpose'] = purpose
     context.user_data['purpose_type'] = purpose_type
     context.user_data['purpose_date'] = purpose_date
@@ -436,11 +429,12 @@ def get_user_data_befor_conv(update, context):
 
     context.user_data['save_in_this_month'] = str(save_in_this_month)
     context.user_data['secret_key'] = secret_key
-    context.user_data['purp_currency'] = currency        
+    context.user_data['purp_currency'] = currency    
+    context.user_data['role'] = role    
 
     today = str(datetime.datetime.now().day)        
     
-    for date in payed_dates:        
+    for date in payed_dates.split(', '):        
         if today == date:            
             index = payed_dates.index(date)
             if index == 0: # Если первая дата в месяце, то задаётся цель на месяц
@@ -461,12 +455,28 @@ def get_user_data_befor_conv(update, context):
 
     user_data_list = [purpose, purpose_type, purp_sum, purpose_date, current_sum, payed_dates, \
         secret_key, currency, save_in_this_month, \
-            sum_to_save_in_this_month]
+            sum_to_save_in_this_month, role]
 
     return user_data_list
 
 
+def clone_admin_data(update, context):    
+    password = context.user_data['secret_key']
+    family_list = select_family_list(password)
 
+    for family in family_list:
+        user_id, _, role = family
+        if role != 'admin':            
+            user_data_list = select_user_data(update.message.chat_id)
+            update_invited_user_data(user_id, user_data_list)
+
+
+def get_family_admin_id(password):
+    family_list = select_family_list(password)  
+    for family in family_list:
+        chat_id, _, role = family
+        if role == 'admin':
+            return chat_id   
 
 
 

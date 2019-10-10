@@ -126,11 +126,11 @@ def invited_user_conv(update, context):
 def get_password(update, context):
     pass_list = list_from_base_column('secret_key') # [('-yGIB7rf?NKU0Dk',), (None,)]
     for item in pass_list:
-        if item[0] == update.message.text:   
+        if item[0] == update.message.text:  
             admin_id = get_family_admin_id(update.message.text)                     
             user_data_list = select_user_data(admin_id)
-            
             update_invited_user_data(update.message.chat_id, user_data_list)
+
             update.message.reply_text('Отлично! Теперь вам будут приходить уведомления')
             break
         else: 
@@ -147,9 +147,10 @@ def start_get_payed_summ(update, context):
 
     purpose, purpose_type, purp_sum, purpose_date, current_sum, payed_dates, \
     secret_key, currency, save_in_this_month, \
-    sum_to_save_in_this_month \
+    sum_to_save_in_this_month, role \
                 = get_user_data_befor_conv(update, context)    
     
+    every_month_purp_sum = int(context.user_data['every_month_purp_sum'])
     payed_summ = update.message.text    
     update.message.reply_text(f'Отлично! {EMOJI["money_mouth_face"]}')
     context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
@@ -177,6 +178,7 @@ def get_saving_sum(update, context):
     write_entry_to_base('save_in_this_month', save_in_this_month, query.message.chat_id)
     context.user_data['current_sum'] = str(current_sum)
     query.message.reply_text(f'Отлично, информацию принял {EMOJI["ok_hand"]}')
+    clone_admin_data(update, context)
 
     resume(update, context)
     return ConversationHandler.END
@@ -207,7 +209,8 @@ def get_other_saving_sum(update, context):
     write_entry_to_base('current_sum', current_sum, update.message.chat_id)     
     write_entry_to_base('save_in_this_month', save_in_this_month, update.message.chat_id)
     context.user_data['current_sum'] = str(current_sum)
-    update.message.reply_text(f'Отлично, информацию принял {EMOJI["ok_hand"]}')    
+    update.message.reply_text(f'Отлично, информацию принял {EMOJI["ok_hand"]}')  
+    clone_admin_data(update, context)  
     
     send_resume(update, context)
     return ConversationHandler.END
