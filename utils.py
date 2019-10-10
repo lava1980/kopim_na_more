@@ -448,7 +448,7 @@ def get_user_data_befor_conv(update, context):
         if today == date:            
             index = payed_dates.index(date)
             if index == 0: # Если первая дата в месяце, то задаётся цель на месяц
-                sum_to_save_in_this_month = (purp_sum - current_sum) / left_days_to_purp * 30
+                sum_to_save_in_this_month = (purp_sum - current_sum) / round(left_days_to_purp / 30)               
                 sum_to_save_in_this_month = int(round(sum_to_save_in_this_month/5.0)*5) 
                 context.user_data['sum_to_save_in_this_month'] = sum_to_save_in_this_month
                 write_entry_to_base(
@@ -456,9 +456,10 @@ def get_user_data_befor_conv(update, context):
                 save_in_this_month = 0
                 context.user_data['save_in_this_month'] = str(save_in_this_month)            
 
-            every_month_purp_sum = (sum_to_save_in_this_month - save_in_this_month)/ (len(payed_dates) - index)
+            every_month_purp_sum = (sum_to_save_in_this_month - save_in_this_month)/ (len(payed_dates.split(', ')) - index)
             every_month_purp_sum = int(round(every_month_purp_sum/5.0)*5) 
             context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)
+            break
         else:
             every_month_purp_sum = '0'
             context.user_data['every_month_purp_sum'] = str(every_month_purp_sum)    
