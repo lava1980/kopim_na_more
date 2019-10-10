@@ -26,15 +26,15 @@ def send_updates(context):
     if len(subs_list) == 0:
         return False
     for subs in subs_list:
-        chat_id, dates, password = subs         
+        chat_id, dates, role = subs         
         date_list = dates.split(', ')
     
         for date_from_base in date_list:
             date_from_base = payday_date_handler(date_from_base) # Проверяем или з/п не приходится на выходной
-            if today_date == int(date_from_base):
+            if today_date == int(date_from_base) and role == 'admin': # Только админам
                 # Основной код, который должен выполняться в день выдачи зарплаты                
                 context.bot.send_message(
-                    chat_id=config.ADMIN_ID, 
+                    chat_id=chat_id, 
                     text=f'Привет {config.EMOJI["waving_hand"]} Сегодня классный день — день зарплаты) Вы получили деньги?',
                     reply_markup=pay_day_inline_keyboard1()
                     )

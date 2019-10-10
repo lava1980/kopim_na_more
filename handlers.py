@@ -180,7 +180,8 @@ def get_saving_sum(update, context):
     query.message.reply_text(f'Отлично, информацию принял {EMOJI["ok_hand"]}')
     clone_admin_data(update, context)
 
-    resume(update, context)
+    send_resume(update, context)
+    send_resume_to_family_in_payday(update, context)
     return ConversationHandler.END
     
  

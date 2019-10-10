@@ -162,7 +162,7 @@ def select_subscribers():
     conn = sqlite3.connect('user_base.db')
     cursor = conn.cursor()
     cursor.execute(
-        'SELECT chat_id, payday_dates, secret_key FROM users'
+        'SELECT chat_id, payday_dates, role FROM users'
         )
     subscribers_list = cursor.fetchall()
     conn.commit()
@@ -286,7 +286,7 @@ def get_resume_text(context):
 
 
 
-def send_resume_to_family(update, context):
+def send_resume_to_family_in_payday(update, context):
     if update.callback_query != None:
         update = update.callback_query
     password = context.user_data['secret_key']
@@ -309,7 +309,7 @@ def send_resume(update, context):
     if context.user_data.get('left_days_to_purp') == None:
         get_user_data_befor_conv(update, context)
     resume(update.message.chat_id, context)
-    send_resume_to_family(update, context)
+    # send_resume_to_family(update, context)
 
 
 
@@ -321,6 +321,16 @@ def resume(chat_id, context):
         chat_id=chat_id, text=text, parse_mode=ParseMode.HTML)
 
 
+
+
+
+# Как мне быть с рассылкой? Как мне быть? 
+
+# Когда челвек сам нажимает на получить данные, то ему приходит рассылка. 
+# Ведь у него тоже есть база, и он берёт данные оттуда. 
+
+# Есть стандартная выдача резюме -- она должна слаться им автоматически. 
+# А те, что они запрашивают вручную, она присылается только ему. 
 
 
 '''ПАРСИМ ДАННЫЕ, КОТОРЫЕ ВВЁЛ ЧЕЛОВЕК'''
@@ -463,6 +473,8 @@ def get_user_data_befor_conv(update, context):
 def clone_admin_data(update, context):    
     password = context.user_data['secret_key']
     family_list = select_family_list(password)
+    if update.callback_query != None:
+        update = update.callback_query
 
     for family in family_list:
         user_id, _, role = family
