@@ -119,7 +119,9 @@ def dontknow(update, context):
 ##################################################
 
 def invited_user_conv(update, context):
-    query = update.callback_query        
+    query = update.callback_query
+    data = get_initial_data(update)
+    write_initial_data_to_base(data)         
     query.message.reply_text('Введите секретный пароль семьи')
     return 'secret_key'
 
@@ -213,6 +215,7 @@ def get_other_saving_sum(update, context):
     update.message.reply_text(f'Отлично, информацию принял {EMOJI["ok_hand"]}')  
     clone_admin_data(update, context)  
     
+    send_resume_to_family_in_payday(update, context)
     send_resume(update, context)
     return ConversationHandler.END
     

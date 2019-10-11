@@ -30,7 +30,7 @@ def send_updates(context):
         date_list = dates.split(', ')
     
         for date_from_base in date_list:
-            date_from_base = payday_date_handler(date_from_base) # Проверяем или з/п не приходится на выходной
+            # date_from_base = payday_date_handler(date_from_base) # Проверяем или з/п не приходится на выходной
             if today_date == int(date_from_base) and role == 'admin': # Только админам
                 # Основной код, который должен выполняться в день выдачи зарплаты                
                 context.bot.send_message(
