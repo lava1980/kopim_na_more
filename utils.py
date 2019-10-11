@@ -29,7 +29,7 @@ def pay_day_inline_keyboard1():
 
 def pay_day_inline_keyboard2(every_month_purp_sum, currency):
     inlinekeyboard = [
-        [InlineKeyboardButton(str(every_month_purp_sum) + ' ' + currency, callback_data=str(every_month_purp_sum)),        
+        [InlineKeyboardButton(str(every_month_purp_sum) + ' ' + currency, callback_data='every_month_purp_sum'),        
         InlineKeyboardButton('Другая', callback_data='other')],
         [InlineKeyboardButton('Пропустить', callback_data='pass_current_month')]                        ]
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
@@ -267,41 +267,18 @@ def get_resume_text(context):
 '''     
     return text
 
-# Что мне надо сделать? Мне надо:
-
-
-
-# 1. Вытянуть из базы всех юзеров, у которых такой же пароль (chat_id).
-# 2. Разослать им сообщение резюме
-
-# Он нажал на кнопку получения инфы. И что? 
-
-# Надо тчобы при нажатии на кнопку:
-# 1. Определить кто это -- админ или член семьи, чтобы понимать, кому слать. А какая
-# разница? Мне надо иметь чат-айди. Чтобы я мог слать сообщения. Мне надо просто понимать, 
-# кому слать. 
-
-# Если это человек, то у него уже есть чат-айди, мне надо просто ... и у него уже есть запись в базе.
-# Мне просто надо её прочитать. Вот и всё, и не надо изобретать велосипед. 
-
-
-
 def send_resume_to_family_in_payday(update, context):
     if update.callback_query != None:
         update = update.callback_query
     password = context.user_data['secret_key']
     family_list = select_family_list(password)
     for family in family_list:
-        chat_id, passw, role = family
+        chat_id = family[0]
         # assert chat_id == update.message.chat_id, 'chat_id не равен update.message.chat_id'
         if chat_id == str(update.message.chat_id):
             continue
         else:
             resume(chat_id, context)
-
-    
-        
-
 
 def send_resume(update, context):
     if update.callback_query != None:
@@ -319,18 +296,6 @@ def resume(chat_id, context):
     time.sleep(2)    
     context.bot.send_message(
         chat_id=chat_id, text=text, parse_mode=ParseMode.HTML)
-
-
-
-
-
-# Как мне быть с рассылкой? Как мне быть? 
-
-# Когда челвек сам нажимает на получить данные, то ему приходит рассылка. 
-# Ведь у него тоже есть база, и он берёт данные оттуда. 
-
-# Есть стандартная выдача резюме -- она должна слаться им автоматически. 
-# А те, что они запрашивают вручную, она присылается только ему. 
 
 
 '''ПАРСИМ ДАННЫЕ, КОТОРЫЕ ВВЁЛ ЧЕЛОВЕК'''

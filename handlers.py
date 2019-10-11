@@ -39,6 +39,8 @@ def initial_data_start(update, context):
     data = get_initial_data(update)
     write_initial_data_to_base(data)
 
+    write_entry_to_base('role', 'admin', query.message.chat_id)
+
     query.message.reply_text('Укажите тип цели', reply_markup=purp_type_inline_keyboard())    
     return 'purpose_type'
 
@@ -121,7 +123,9 @@ def dontknow(update, context):
 def invited_user_conv(update, context):
     query = update.callback_query
     data = get_initial_data(update)
-    write_initial_data_to_base(data)         
+    write_initial_data_to_base(data)   
+    write_entry_to_base('role', 'user', query.message.chat_id)    
+
     query.message.reply_text('Введите секретный пароль семьи')
     return 'secret_key'
 
@@ -171,10 +175,10 @@ def get_saving_sum(update, context):
     query = update.callback_query
     every_month_purp_sum = context.user_data['every_month_purp_sum']
     save_in_this_month = int(context.user_data['save_in_this_month'])
-    if query.data == every_month_purp_sum:    
-        current_sum = int(context.user_data['current_sum'])
-        current_sum = current_sum + int(every_month_purp_sum)             
-        save_in_this_month = save_in_this_month + int(every_month_purp_sum)
+      
+    current_sum = int(context.user_data['current_sum'])
+    current_sum = current_sum + int(every_month_purp_sum)             
+    save_in_this_month = save_in_this_month + int(every_month_purp_sum)    
 
     write_entry_to_base('current_sum', current_sum, query.message.chat_id) 
     write_entry_to_base('save_in_this_month', save_in_this_month, query.message.chat_id)
@@ -190,13 +194,16 @@ def get_saving_sum(update, context):
     
 #########################################################
 
-def get_other_sum(update, context):    
-    query = update.callback_query  
+def get_other_sum(update, context):  
+    query = update.callback_query      
     if query != None:      # Через инлайн клавиатуру, user_data подгружены
         query.message.reply_text(
             f'Введите сумму, которую отложите {EMOJI["hand_pointing_down"]}')    
     else:
         get_user_data_befor_conv(update, context) # Вызов через команду, подгружаем user_data
+        if context.user_data['role'] == 'user':
+            update.message.reply_text(f'Нет доступа {EMOJI["shrug"]} Доступ к пополнению есть только у админа семьи')
+            return ConversationHandler.END
         update.message.reply_text(
             f'Введите сумму, которую отложите {EMOJI["hand_pointing_down"]}')
     return 'enter_sum'
@@ -233,7 +240,7 @@ def set_delay(update, context):
     query = update.callback_query
     chat_id = query.message.chat_id    
     # new_job = context.job_queue.run_repeating(ask_question, 10, context=chat_id)        
-    new_job = context.job_queue.run_once(ask_question, datetime.timedelta(seconds=10.0), context=chat_id)        
+    new_job = context.job_queue.run_once(ask_question, datetime.timedelta(seconds=7200.0), context=chat_id)        
     context.chat_data['job'] = new_job
     query.message.reply_text(f'странно... {EMOJI["thinking_face"]} ок, спрошу позже')    
     print(context.user_data)
@@ -261,8 +268,6 @@ def ask_question(context):
         )
 
 
-
-# TODO Сделать, чтобы уведомления приходили не админам.
 
 # TODO Сделать поздравления, когда месячная цель достигнута. Т.е. 
 # sum_to_save_in_this_month == save_in_this_month.

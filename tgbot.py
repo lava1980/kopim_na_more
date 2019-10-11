@@ -102,7 +102,7 @@ def main():
             'how_much_saving': [CallbackQueryHandler(get_other_sum, pattern='other'),
                                 CallbackQueryHandler(pass_current_month, pattern='pass_current_month'),
                                 CallbackQueryHandler(pass_current_month, pattern='pass_current_month_2'),
-                                CallbackQueryHandler(get_saving_sum)],
+                                CallbackQueryHandler(get_saving_sum, pattern='every_month_purp_sum')],
             'enter_sum': [MessageHandler(Filters.text, get_other_saving_sum)] 
         }, 
         fallbacks = [MessageHandler(Filters.text, dontknow)]
