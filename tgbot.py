@@ -116,22 +116,17 @@ def main():
     dp.add_handler(CommandHandler('start', greet_user))      
     dp.add_handler(CommandHandler('now', send_resume))      
     
-    # webhook_domain = 'https://python-developer.ru'
-    # webhook_domain = 'https://0s0bgia3m3.execute-api.us-east-2.amazonaws.com/v1'
-    # PORT = 5079
-    
-    # Использовать незарезервированный порт, например, 5000. 
-    # Если порт зарезервирован, то будет 502 bad gateway
-    # Порт сервера и порт в ngrok должны совпадать. В механике разберусь потом. 
+    webhook_domain = 'https://python-developer.ru'    
+    PORT = 5000
+
+    mybot.start_webhook(listen='127.0.0.1',
+                    port=PORT,
+                    url_path=config.TOKEN,
+                    webhook_url=f'{webhook_domain}/{config.TOKEN}')
 
 
-    # mybot.start_webhook(listen='127.0.0.1',
-    #                 port=PORT,
-    #                 url_path=config.TOKEN,
-    #                 webhook_url=f'{webhook_domain}/{config.TOKEN}')
 
 
-    mybot.start_polling()  
     mybot.idle()
 
 
