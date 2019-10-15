@@ -14,6 +14,17 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
                     )
     
 
+def check_if_is_subscriber(update, context):
+    user_id_list = list_from_base_column('chat_id')
+    for user in user_id_list:
+        if user[0] == str(update.message.chat_id):
+            update.message.reply_text(
+                'Вы уже подписаны. Желаете подписаться ещё раз?',
+                reply_markup=resubscribe_keyboard())
+            return
+    greet_user(update, context)
+
+
 def greet_user(update, context):
     text_to_user = f'''Привет {EMOJI["waving_hand"]} Я помогу вам собрать \
 деньги на отдых, покупку чего-либо и другие цели {EMOJI["money_bag"]} Основная моя задача — сделать так, чтобы вы не забывали про цель... \
@@ -126,7 +137,7 @@ def invited_user_conv(update, context):
     write_initial_data_to_base(data)   
     write_entry_to_base('role', 'user', query.message.chat_id)    
 
-    query.message.reply_text('Введите секретный пароль семьи')
+    query.message.reply_text(f'Введите секретный пароль семьи {EMOJI["key"]}')
     return 'secret_key'
 
 def get_password(update, context):
@@ -267,6 +278,14 @@ def ask_question(context):
         reply_markup=pay_day_inline_keyboard1()
         )
 
+##############################
+
+def callback_other_handler(update, context):   # Обрабатывает запросы без паттерна
+    query = update.callback_query
+    if query.data == 'resubscribe':
+        greet_user(update.callback_query, context)
+    if query.data == 'net_resubscribe':
+        query.message.reply_text(f'Ок {EMOJI["ok_hand"]} ваши настройки остались прежними')
 
 
 # TODO Сделать поздравления, когда месячная цель достигнута. Т.е. 

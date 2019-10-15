@@ -113,21 +113,22 @@ def main():
     dp.add_handler(enter_secret_key)
     dp.add_handler(initial_data) 
     dp.add_handler(CallbackQueryHandler(set_delay, pattern='no'))   
-    dp.add_handler(CommandHandler('start', greet_user))      
-    dp.add_handler(CommandHandler('now', send_resume))      
+    dp.add_handler(CommandHandler('start', check_if_is_subscriber))      
+    dp.add_handler(CommandHandler('now', send_resume))    
+    dp.add_handler(CallbackQueryHandler(callback_other_handler))   
     
-    webhook_domain = 'https://python-developer.ru'    
-    PORT = 5000
+    # webhook_domain = 'https://python-developer.ru'    
+    # PORT = 5000
 
-    mybot.start_webhook(listen='127.0.0.1',
-                    port=PORT,
-                    url_path=config.TOKEN,
-                    webhook_url=f'{webhook_domain}/{config.TOKEN}'                    
-                    )
+    # mybot.start_webhook(listen='127.0.0.1',
+    #                 port=PORT,
+    #                 url_path=config.TOKEN,
+    #                 webhook_url=f'{webhook_domain}/{config.TOKEN}'                    
+    #                 )
 
 
-    mybot.bot.set_webhook(f'{webhook_domain}/{config.TOKEN}')
-
+    # mybot.bot.set_webhook(f'{webhook_domain}/{config.TOKEN}')
+    mybot.start_polling()
     mybot.idle()
 
 

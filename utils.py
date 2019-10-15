@@ -21,6 +21,13 @@ def get_inline_keyboard():
     return kbd_markup
 
 
+def resubscribe_keyboard():
+    inlinekeyboard = [[InlineKeyboardButton('Да', callback_data='resubscribe'),
+                        InlineKeyboardButton('Нет', callback_data='net_resubscribe')]]
+    kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
+    return kbd_markup
+
+
 def pay_day_inline_keyboard1():
     inlinekeyboard = [[InlineKeyboardButton('Да', callback_data='yes'),
                         InlineKeyboardButton('Нет', callback_data='no')]]
