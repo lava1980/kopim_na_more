@@ -176,7 +176,7 @@ def get_subscribers_send_to(date_str): # '11'
         date_list = subscriber[1].split(', ')
         if date_str in date_list:
             subs_list_send_to.append(subscriber)
-    print(list(subs_list_send_to))
+    # print(list(subs_list_send_to))
     return subs_list_send_to # [('891850606', '2, 1, 13', '-yGIB7rf?NKU0Dk')]
 
 def password_generation():

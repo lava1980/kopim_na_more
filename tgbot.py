@@ -122,10 +122,11 @@ def main():
     mybot.start_webhook(listen='127.0.0.1',
                     port=PORT,
                     url_path=config.TOKEN,
-                    webhook_url=f'{webhook_domain}/{config.TOKEN}')
+                    webhook_url=f'{webhook_domain}/{config.TOKEN}'                    
+                    )
 
 
-
+    mybot.bot.set_webhook(f'{webhook_domain}/{config.TOKEN}')
 
     mybot.idle()
 
