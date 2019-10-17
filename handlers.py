@@ -251,10 +251,17 @@ def set_delay(update, context):
     query = update.callback_query
     chat_id = query.message.chat_id    
     # new_job = context.job_queue.run_repeating(ask_question, 10, context=chat_id)        
-    new_job = context.job_queue.run_once(ask_question, datetime.timedelta(seconds=7200.0), context=chat_id)        
+    new_job = context.job_queue.run_once(
+        ask_question, datetime.timedelta(seconds=7200.0), context=chat_id)        
+    print(str(new_job.context))
     context.chat_data['job'] = new_job
     query.message.reply_text(f'странно... {EMOJI["thinking_face"]} ок, спрошу позже')    
-    print(context.user_data)
+    print(context.chat_data)
+
+# new_job = <telegram.ext.jobqueue.Job object at 0x7f4ae9f43518>
+# new_job.context = '532153211' # это chat_id, который мы передали параметром
+# context.chat_data = {'job': <telegram.ext.jobque...ae9f43518>}
+# 
 
 def unset(update, context):
     # query = update.callback_query

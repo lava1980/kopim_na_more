@@ -161,7 +161,7 @@ sum_to_save_in_this_month, role FROM users WHERE chat_id=?',
     date_list = cursor.fetchall()
     conn.commit()
     conn.close()        
-    print(date_list[0])   
+    # print(date_list[0])   
     return date_list[0]
 
 

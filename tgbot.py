@@ -61,7 +61,8 @@ def main():
 
     dp = mybot.dispatcher
     
-    mybot.job_queue.run_repeating(send_updates, 120, 1)        
+    # mybot.job_queue.run_daily(send_updates, datetime.time(16, 0, 0))        
+    mybot.job_queue.run_repeating(send_updates, interval=30, first=1)        
 
     
     initial_data = ConversationHandler(
