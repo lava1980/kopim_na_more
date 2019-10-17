@@ -480,4 +480,7 @@ if __name__ == '__main__':
     # day_to_purp('529133148')
     # parse_purpose_sum('50 ДОЛЛАРОВ')
     # print(check_user_sum_entry('50 000 jkjkjk'))
-    select_user_data('529133148')
+    # select_user_data('529133148')
+    context = {}
+    p = check_user_sum_entry('540 рублей', '529133148', context)
+    print(p)

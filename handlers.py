@@ -129,11 +129,18 @@ def get_payday_dates(update, context):
     write_entry_to_base('payday_dates', dates, update.message.chat_id) 
     update.message.reply_text('Спасибо, ответы принял.')
 
-    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)    
-    password = password_generation()
-    write_entry_to_base('secret_key', password, update.message.chat_id)
-    update.message.reply_text('Пароль вашей семьи: ' + password)
-    update.message.reply_text('Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю историю.')
+    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)   
+
+    password = get_data_cell('secret_key', update.message.chat_id) 
+    logging.info('Пароль == ' + password)
+    if password == '' or password == None:    
+        password = password_generation()
+        write_entry_to_base('secret_key', password, update.message.chat_id)
+        update.message.reply_text('Пароль вашей семьи: ' + password)
+        update.message.reply_text(
+            'Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю историю.')
+    else: 
+        update.message.reply_text('Семейный пароль остался такой же')
     return ConversationHandler.END   
 
 def dontknow(update, context):
