@@ -66,19 +66,24 @@ def get_purpose_type(update, context):
     return 'purpose'
 
 
-def get_purpose(update, context):      
+def get_purpose(update, context):     
+    logging.info('Цель для записи в базу: ' + update.message.text) 
     write_entry_to_base('purpose', update.message.text, update.message.chat_id)
+    context.user_data['purpose'] = update.message.text
+
     update.message.reply_text(
         f'Какую сумму хотите собрать? Например, 1000 долларов... или 2000 белорусских рублей {EMOJI["winking_face"]}')            
     return 'purpose_sum'
 
 def get_purpose_sum(update, context):          
-    if check_user_sum_entry(update.message.text, update.message.chat_id, context) == True:        
+    if check_user_sum_entry(update.message.text, update.message.chat_id, context) == True:   
+        logging.info('Сумма для записи в базу: ' + update.message.text)      
         write_entry_to_base(
                     'purpose_sum', 
                     int(update.message.text.split()[0]), 
                     update.message.chat_id
-                    )            
+                    ) 
+        context.user_data['purpose_sum'] = update.message.text.split()[0]
     else: 
         update.message.reply_text(f'''Извините, не понимаю... {EMOJI["thinking_face"]} \
 Напишите сумму, которую хотите накопить. Например, 1000 долларов. Цифру пишите без пробелов''')
@@ -91,6 +96,10 @@ def get_purpose_date(update, context):
     purpose_date = parse_purp_date(update.message.text) 
     if purpose_date != -1:
         write_entry_to_base('purpose_date', purpose_date, update.message.chat_id)
+        context.user_data['purpose_date'] = str(purpose_date)        
+        
+        context.user_data['left_days_to_purp'] = str(day_to_purp(update.message.chat_id, str(purpose_date)))
+
         purp_currency = context.user_data['purp_currency']
         update.message.reply_text(f'Сколько денег есть на данный момент (в {purp_currency})?')
         return 'current_sum'
@@ -102,6 +111,7 @@ def get_current_sum(update, context):
     current_summ = parse_current_sum(update.message.text, context)
     if current_summ != -1:
         write_entry_to_base('current_sum', current_summ, update.message.chat_id)
+        context.user_data['current_sum'] = current_summ
         update.message.reply_text('В какие дни у вас приход денег?')
         return 'payday_dates'
     else:

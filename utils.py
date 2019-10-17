@@ -358,7 +358,10 @@ def parse_purp_date(date_str):
         elif len(word_list) == 2:
             year = str(datetime.datetime.today().year)
             word_list.append(year)
-            purp_date = date_to_sql_format(word_list, month_list)
+            try:
+                purp_date = date_to_sql_format(word_list, month_list)
+            except ValueError:
+                return -1
             delta = purp_date - datetime.date.today()
             if delta.days < 0:
                 year = str(datetime.datetime.today().year + 1)
