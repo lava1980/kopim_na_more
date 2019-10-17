@@ -330,8 +330,7 @@ def check_user_sum_entry(text, chat_id, context):
                 if item in text:
                     write_entry_to_base('purp_currency', 'RUB', chat_id)
                     context.user_data['purp_currency'] = 'RUB'
-                    return True
-                return False
+                    return True                
         else: return False
     else: return False
 
