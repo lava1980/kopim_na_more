@@ -348,11 +348,17 @@ def parse_purp_date(date_str):
     word_list = date_str.split()
     if len(word_list) > 1 and word_list[0].isdigit() == True and int(word_list[0]) < 32 and word_list[1].isdigit() == False:
         if len(word_list) == 3:
-            purp_date = date_to_sql_format(word_list, month_list)
+            try:
+                purp_date = date_to_sql_format(word_list, month_list)
+            except ValueError:
+                return -1
             return purp_date
         elif len(word_list) == 4:
             del word_list[-1]
-            purp_date = date_to_sql_format(word_list, month_list)
+            try:
+                purp_date = date_to_sql_format(word_list, month_list)
+            except ValueError:
+                return -1
             return purp_date
         elif len(word_list) == 2:
             year = str(datetime.datetime.today().year)
@@ -366,8 +372,10 @@ def parse_purp_date(date_str):
                 year = str(datetime.datetime.today().year + 1)
                 del word_list[-1]
                 word_list.append(year)
-                purp_date = date_to_sql_format(word_list, month_list)
-                print(purp_date)
+                try:
+                    purp_date = date_to_sql_format(word_list, month_list)
+                except ValueError:
+                    return -1                
                 return purp_date
             else: return purp_date    
         else: return -1
