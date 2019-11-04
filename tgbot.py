@@ -10,6 +10,7 @@ from telegram.ext import messagequeue as mq
 
 import config
 from handlers import *
+from messages import *
 import utils
 
 

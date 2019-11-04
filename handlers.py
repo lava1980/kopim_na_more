@@ -4,8 +4,9 @@ from telegram import ChatAction, ParseMode
 from telegram.ext import ConversationHandler
 import time
 
-from config import EMOJI, PURPOSE_TEXT, PURPOSE_DATE_TEXT
+from config import PURPOSE_TEXT, PURPOSE_DATE_TEXT
 from utils import *
+from messages import *
 
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s',

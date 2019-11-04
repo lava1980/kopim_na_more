@@ -8,6 +8,7 @@ from telegram import ChatAction, InlineKeyboardButton, InlineKeyboardMarkup, Par
 import time
 
 import config
+from messages import *
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s',
                     level = logging.INFO,
@@ -241,14 +242,19 @@ def payday_date_handler(date_from_base):   # Число в строке '15'
     print(date_from_base)
     return date_from_base
 
-def day_to_purp(chat_id, purpose_date):    
+def day_to_purp(purpose_date):    
     purp_date = datetime.datetime.strptime(purpose_date, '%Y-%m-%d')
     today = datetime.datetime.today()
     delta = purp_date - today    
     return delta.days
 
+
 def get_resume_text(context):
-    left_days_to_purp = int(context.user_data['left_days_to_purp'])
+    purpose_date = context.user_data['purpose_date']
+    left_days_to_purp = day_to_purp(purpose_date)    
+    purp_date = datetime.datetime.strptime(
+        context.user_data['purpose_date'], '%Y-%m-%d')
+    
     current_sum = int(context.user_data['current_sum'])
     purp_sum = int(context.user_data['purpose_sum'])
     left_to_collect = purp_sum - current_sum
@@ -258,24 +264,24 @@ def get_resume_text(context):
     progres = int(round(current_sum / purp_sum * 100))
     currency = context.user_data['purp_currency']
     
-    locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
-    date_str = datetime.datetime.strptime(context.user_data['purpose_date'], '%Y-%m-%d')
-    date_str = date_str.strftime('%d %B %Y')
+    locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")    
+    date_str = purp_date.strftime('%d %B %Y') # 15 августа 2020  
 
-    text = f'''{config.EMOJI['megaphone']} <b>Ситуация на текущий момент:</b> 
+    text = f'''{EMOJI['megaphone']} <b>Ситуация на текущий момент:</b> 
 
-{config.EMOJI['target']} Цель: {context.user_data['purpose']}
-{config.EMOJI['calendar']} Дата цели: {date_str}
+{EMOJI['target']} Цель: {context.user_data['purpose']}
+{EMOJI['calendar']} Дата цели: {date_str}
 ----------
-{config.EMOJI['foot']} Осталось: {str(left_days_to_purp)} дней
-{config.EMOJI['money_bag']} На сегодня собрали: {str(current_sum)} {currency}
-{config.EMOJI['hand_right']} Осталось собрать: {str(left_to_collect)} {currency}
+{EMOJI['foot']} Осталось: {str(left_days_to_purp)} дней
+{EMOJI['money_bag']} На сегодня собрали: {str(current_sum)} {currency}
+{EMOJI['hand_right']} Осталось собрать: {str(left_to_collect)} {currency}
 
-{config.EMOJI['bar_chart']} Цель выполнена на {str(progres)}%
+{EMOJI['bar_chart']} Цель выполнена на {str(progres)}%
 
-{config.EMOJI['double_exclamation_mark']} План: ежемесячно откладывать <b>не менее {str(save_per_month)} {currency}</b>
+{EMOJI['double_exclamation_mark']} План: ежемесячно откладывать <b>не менее {str(save_per_month)} {currency}</b>
 '''     
     return text
+
 
 def send_resume_to_family_in_payday(update, context):
     if update.callback_query != None:
@@ -414,7 +420,7 @@ def get_user_data_befor_conv(update, context):
     context.user_data['purpose_type'] = purpose_type
     context.user_data['purpose_date'] = purpose_date
 
-    left_days_to_purp = day_to_purp(update.message.chat_id, purpose_date)
+    left_days_to_purp = day_to_purp(purpose_date)
     context.user_data['left_days_to_purp'] = str(left_days_to_purp)
 
     context.user_data['purpose_sum'] = str(purp_sum)    
