@@ -30,7 +30,9 @@ def greet_user(update, context):
 деньги на отдых, покупку чего-либо и другие цели {EMOJI["money_bag"]} Основная моя задача — сделать так, чтобы вы не забывали про цель... \
 чтобы постоянно к ней возвращались, думали про неё, мечтали и т.п.'''
     context.bot.send_message(chat_id=update.message.chat_id, text=text_to_user)      
-    context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
+    context.bot.send_chat_action(
+        chat_id=update.message.chat_id, 
+        action=ChatAction.TYPING)
     time.sleep(1)
     context.bot.send_message(
         chat_id=update.message.chat_id, 
@@ -141,6 +143,7 @@ def get_payday_dates(update, context):
             'Передайте его родственнику, с которым вы вместе собираете деньги, чтобы он мог присоединиться к боту и видеть всю историю.')
     else: 
         update.message.reply_text('Семейный пароль остался такой же')
+    clone_admin_data(update, context)
     return ConversationHandler.END   
 
 def dontknow(update, context):
@@ -267,7 +270,6 @@ def pass_current_month(update, context):
 def set_delay(update, context): 
     query = update.callback_query
     chat_id = query.message.chat_id    
-    # new_job = context.job_queue.run_repeating(ask_question, 10, context=chat_id)        
     new_job = context.job_queue.run_once(
         ask_question, datetime.timedelta(seconds=7200.0), context=chat_id)        
     print(str(new_job.context))
@@ -275,10 +277,6 @@ def set_delay(update, context):
     query.message.reply_text(f'странно... {EMOJI["thinking_face"]} ок, спрошу позже')    
     print(context.chat_data)
 
-# new_job = <telegram.ext.jobqueue.Job object at 0x7f4ae9f43518>
-# new_job.context = '532153211' # это chat_id, который мы передали параметром
-# context.chat_data = {'job': <telegram.ext.jobque...ae9f43518>}
-# 
 
 def unset(update, context):
     # query = update.callback_query
@@ -293,6 +291,7 @@ def unset(update, context):
     del context.chat_data['job']
     # query.message.reply_text('Timer successfully unset!')
 
+
 def ask_question(context):
     """Send the alarm message."""
     job = context.job
@@ -306,10 +305,11 @@ def ask_question(context):
 
 def callback_other_handler(update, context):   # Обрабатывает запросы без паттерна
     query = update.callback_query
-    if query.data == 'resubscribe':
+    if query.data == 'resubscribe':        
         greet_user(update.callback_query, context)
     if query.data == 'net_resubscribe':
         query.message.reply_text(f'Ок {EMOJI["ok_hand"]} ваши настройки остались прежними')
+    get_user_data_befor_conv(update.callback_query, context)
 
 
 # TODO Сделать поздравления, когда месячная цель достигнута. Т.е. 

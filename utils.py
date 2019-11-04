@@ -2,6 +2,7 @@ import datetime
 import locale
 import logging
 import random
+import requests
 import sqlite3
 from telegram import ChatAction, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 import time
@@ -29,8 +30,10 @@ def resubscribe_keyboard():
 
 
 def pay_day_inline_keyboard1():
-    inlinekeyboard = [[InlineKeyboardButton('Да', callback_data='yes'),
-                        InlineKeyboardButton('Нет', callback_data='no')]]
+    inlinekeyboard = [
+        [InlineKeyboardButton('Да', callback_data='yes'),
+        InlineKeyboardButton('Нет', callback_data='no')]
+        ]
     kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
     return kbd_markup
 
@@ -473,6 +476,13 @@ def get_family_admin_id(password):
         if role == 'admin':
             return chat_id   
 
+
+def send_telegram_message(text):
+    url = f'https://api.telegram.org/bot{config.ERROR_TG_TOKEN}/sendMessage'
+    data = {'chat_id': config.ADMIN_CHAT_ID,
+            'text': text
+            }
+    requests.get(url, params=data)
 
 
 
